@@ -1,16 +1,82 @@
-# guard_up_app
+# Guard Up App
 
-A new Flutter project.
+> 한이음 드림업 사회공헌 프로젝트 — **안심 계약 가디언**
 
-## Getting Started
+자립준비청년을 위한 전세 계약서 AI 분석 모바일 앱
 
-This project is a starting point for a Flutter application.
+---
 
-A few resources to get you started if this is your first Flutter project:
+## 프로젝트 소개
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+전세 계약 경험이 부족한 자립준비청년이 계약서를 직접 촬영하면, AI가 위험 조항을 분석하여 안심/주의/위험 3단계로 결과를 제공합니다. 복잡한 법률 용어 없이 누구나 쉽게 계약서 리스크를 파악할 수 있도록 돕는 것이 목표입니다.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+---
+
+## 기술 스택
+
+| 분류 | 기술 |
+|------|------|
+| 프레임워크 | Flutter |
+| 상태 관리 | GetX |
+| 언어 | Dart |
+| 백엔드 연동 | HTTP (FastAPI) |
+
+---
+
+## 주요 화면
+
+- **메인 화면** — 앱 시작 및 안내
+- **계약서 촬영 화면** — 카메라로 계약서 스캔
+- **분석 결과 화면** — 안심 / 주의 / 위험 3단계 결과 표시
+- **액션 가이드 화면** — 위험 항목별 대처 방법 안내
+
+---
+
+## 프로젝트 구조
+
+```
+lib/
+├── main.dart
+└── app/
+    ├── modules/          # 화면별 모듈 (GetX)
+    │   └── home/
+    │       ├── bindings/
+    │       ├── controllers/
+    │       └── views/
+    └── routes/           # 앱 라우팅
+```
+
+---
+
+## 팀 구성
+
+| 역할 | 담당자 |
+|------|--------|
+| 프론트엔드 (Flutter + Figma) | 해빈 |
+
+---
+
+## Git 브랜치 전략
+
+```
+main      → 배포용 (최종 안정 버전)
+develop   → 개발 통합 브랜치
+feature/* → 기능별 개발 브랜치
+```
+
+- 모든 작업은 `feature/*` 브랜치에서 진행
+- PR 필수, 팀장 승인 후 `develop`에 머지
+
+---
+
+## 시작하기
+
+```bash
+# 의존성 설치
+flutter pub get
+
+# 앱 실행
+flutter run
+```
+
+**Flutter SDK:** ^3.10.4 이상 필요
