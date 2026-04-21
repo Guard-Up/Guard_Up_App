@@ -23,6 +23,22 @@
 
 ---
 
+## 개발 환경 버전
+
+> 팀원 간 버전을 반드시 통일해야 합니다.
+
+| 항목 | 버전 |
+|------|------|
+| Flutter | 3.38.5 (stable) |
+| Dart | 3.10.4 |
+| Android SDK | 35.0.0 |
+| Android Gradle Plugin (AGP) | 8.11.1 |
+| Kotlin | 2.2.20 |
+| Java (JDK) | 17.0.18 (Temurin) |
+| Xcode (iOS) | 15.2 |
+
+---
+
 ## 주요 화면
 
 - **메인 화면** — 앱 시작 및 안내
@@ -71,6 +87,46 @@ feature/* → 기능별 개발 브랜치
 
 ## 시작하기
 
+### 사전 준비 (최초 1회)
+
+**1. Flutter 설치 및 버전 확인**
+```bash
+flutter --version
+# Flutter 3.38.5 이어야 함
+# 다르면: flutter upgrade
+```
+
+**2. Android cmdline-tools 설치**
+
+`https://developer.android.com/studio#command-line-tools-only` 에서 macOS용 zip 다운로드 후:
+```bash
+mkdir -p ~/Library/Android/sdk/cmdline-tools/latest
+cp -r ~/Downloads/cmdline-tools/* ~/Library/Android/sdk/cmdline-tools/latest/
+```
+
+**3. 환경변수 설정 (~/.zshrc)**
+```bash
+echo 'export ANDROID_HOME=$HOME/Library/Android/sdk' >> ~/.zshrc
+echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> ~/.zshrc
+source ~/.zshrc
+```
+
+**4. Android 라이선스 동의**
+```bash
+flutter doctor --android-licenses
+# 모두 y 입력 (한영 전환 확인!)
+```
+
+**5. 환경 확인**
+```bash
+flutter doctor
+# [✓] Flutter, [✓] Android toolchain 확인
+```
+
+---
+
+### 프로젝트 실행
+
 ```bash
 # 의존성 설치
 flutter pub get
@@ -78,5 +134,3 @@ flutter pub get
 # 앱 실행
 flutter run
 ```
-
-**Flutter SDK:** ^3.10.4 이상 필요
