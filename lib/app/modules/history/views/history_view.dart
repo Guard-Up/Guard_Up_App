@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../controllers/home_controller.dart';
+import '../controllers/history_controller.dart';
 
-class HomeView extends GetView<HomeController> {
-  const HomeView({super.key});
+class HistoryView extends GetView<HistoryController> {
+  const HistoryView({super.key});
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: Text('HomeView'),
+        child: Text('HistoryView'),
       ),
     );
   }
