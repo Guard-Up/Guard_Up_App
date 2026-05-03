@@ -1,20 +1,60 @@
 import 'package:get/get.dart';
-
+import 'app_routes.dart';
+import '../modules/splash/bindings/splash_binding.dart';
+import '../modules/splash/views/splash_view.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_view.dart';
-
-part 'app_routes.dart';
+import '../modules/scan/bindings/scan_binding.dart';
+import '../modules/scan/views/scan_view.dart';
+import '../modules/analyzing/bindings/analyzing_binding.dart';
+import '../modules/analyzing/views/analyzing_view.dart';
+import '../modules/result/bindings/result_binding.dart';
+import '../modules/result/views/result_view.dart';
+import '../modules/history/bindings/history_binding.dart';
+import '../modules/history/views/history_view.dart';
+import '../modules/guide/bindings/guide_binding.dart';
+import '../modules/guide/views/guide_view.dart';
 
 class AppPages {
   AppPages._();
 
-  static const INITIAL = Routes.HOME;
+  static const initial = Routes.splash;
 
   static final routes = [
     GetPage(
-      name: _Paths.HOME,
+      name: Routes.splash,
+      page: () => const SplashView(),
+      binding: SplashBinding(),
+    ),
+    GetPage(
+      name: Routes.home,
       page: () => const HomeView(),
       binding: HomeBinding(),
+    ),
+    GetPage(
+      name: Routes.scan,
+      page: () => const ScanView(),
+      binding: ScanBinding(),
+    ),
+    GetPage(
+      name: Routes.analyzing,
+      page: () => const AnalyzingView(),
+      binding: AnalyzingBinding(),
+    ),
+    GetPage(
+      name: Routes.result,
+      page: () => const ResultView(),
+      binding: ResultBinding(),
+    ),
+    GetPage(
+      name: Routes.history,
+      page: () => const HistoryView(),
+      binding: HistoryBinding(),
+    ),
+    GetPage(
+      name: Routes.guide,
+      page: () => const GuideView(),
+      binding: GuideBinding(),
     ),
   ];
 }
