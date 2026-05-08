@@ -25,16 +25,16 @@ class AnalyzingController extends GetxController {
 
   Future<void> _runAnalysis() async {
     final args = Get.arguments;
-    if (args is! Map || args['base64Image'] == null) {
+    if (args is! Map || args['imagePath'] == null) {
       hasError.value = true;
       return;
     }
-    final base64Image = args['base64Image'] as String;
+    final imagePath = args['imagePath'] as String;
 
     try {
       // 1단계: 이미지 분석
       currentStep.value = 0;
-      final imageResult = await _apiProvider.analyzeImage(base64Image);
+      final imageResult = await _apiProvider.analyzeImage(imagePath);
 
       // 2단계: 주소 검증
       currentStep.value = 1;
