@@ -6,8 +6,6 @@ class BuildingResponse {
   final bool isRegistered;
   final int? salePrice;
   final String? jeonseRatio;
-  final bool? guaranteeAvailable;
-
   const BuildingResponse({
     this.buildingName,
     this.buildYear,
@@ -16,7 +14,6 @@ class BuildingResponse {
     required this.isRegistered,
     this.salePrice,
     this.jeonseRatio,
-    this.guaranteeAvailable,
   });
 
   factory BuildingResponse.fromJson(Map<String, dynamic> json) {
@@ -28,7 +25,6 @@ class BuildingResponse {
       isRegistered: json['is_registered'] as bool,
       salePrice: json['sale_price'] as int?,
       jeonseRatio: json['jeonse_ratio'] as String?,
-      guaranteeAvailable: json['guarantee_available'] as bool?,
     );
   }
 }

@@ -38,14 +38,15 @@ class ApiProvider {
   }
 
   // 1단계: 계약서 이미지 분석
-  Future<AnalyzeImageResponse> analyzeImage(String base64Image) async {
-    final response = await _client
-        .post(
-          Uri.parse('${ApiConstants.baseUrl}${ApiConstants.analyzeImage}'),
-          headers: _headers,
-          body: jsonEncode({'image': base64Image}),
-        )
-        .timeout(ApiConstants.requestTimeout);
+  Future<AnalyzeImageResponse> analyzeImage(String imagePath) async {
+    final request = http.MultipartRequest(
+      'POST',
+      Uri.parse('${ApiConstants.baseUrl}${ApiConstants.analyzeImage}'),
+    );
+    request.files.add(await http.MultipartFile.fromPath('file', imagePath));
+
+    final streamed = await request.send().timeout(ApiConstants.requestTimeout);
+    final response = await http.Response.fromStream(streamed);
 
     _handleError(response);
     return AnalyzeImageResponse.fromJson(

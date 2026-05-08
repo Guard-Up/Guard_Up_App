@@ -107,15 +107,11 @@ class ActionGuide {
 
 class PublicData {
   final String jeonseRatio;
-  final bool guaranteeAvailable;
-  final int? maxGuaranteeAmount;
   final bool isRegistered;
   final int? mortgageAmount;
 
   const PublicData({
     required this.jeonseRatio,
-    required this.guaranteeAvailable,
-    this.maxGuaranteeAmount,
     required this.isRegistered,
     this.mortgageAmount,
   });
@@ -123,8 +119,6 @@ class PublicData {
   factory PublicData.fromJson(Map<String, dynamic> json) {
     return PublicData(
       jeonseRatio: json['jeonse_ratio'] as String,
-      guaranteeAvailable: json['guarantee_available'] as bool,
-      maxGuaranteeAmount: json['max_guarantee_amount'] as int?,
       isRegistered: json['is_registered'] as bool,
       mortgageAmount: json['mortgage_amount'] as int?,
     );
@@ -132,9 +126,6 @@ class PublicData {
 
   Map<String, dynamic> toJson() => {
         'jeonse_ratio': jeonseRatio,
-        'guarantee_available': guaranteeAvailable,
-        if (maxGuaranteeAmount != null)
-          'max_guarantee_amount': maxGuaranteeAmount,
         'is_registered': isRegistered,
         if (mortgageAmount != null) 'mortgage_amount': mortgageAmount,
       };
