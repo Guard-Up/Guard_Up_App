@@ -8,4 +8,6 @@ abstract class Routes {
   static const result = '/result';
   static const history = '/history';
   static const guide = '/guide';
+  static const guideQna = '/guide/qna';
+  static const guideDetail = '/guide/detail';
 }
