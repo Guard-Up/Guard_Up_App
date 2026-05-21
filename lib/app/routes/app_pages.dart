@@ -14,6 +14,10 @@ import '../modules/history/bindings/history_binding.dart';
 import '../modules/history/views/history_view.dart';
 import '../modules/guide/bindings/guide_binding.dart';
 import '../modules/guide/views/guide_view.dart';
+import '../modules/guide_qna/bindings/guide_qna_binding.dart';
+import '../modules/guide_qna/views/guide_qna_view.dart';
+import '../modules/guide_detail/bindings/guide_detail_binding.dart';
+import '../modules/guide_detail/views/guide_detail_view.dart';
 
 class AppPages {
   AppPages._();
@@ -55,6 +59,16 @@ class AppPages {
       name: Routes.guide,
       page: () => const GuideView(),
       binding: GuideBinding(),
+    ),
+    GetPage(
+      name: Routes.guideQna,
+      page: () => const GuideQnaView(),
+      binding: GuideQnaBinding(),
+    ),
+    GetPage(
+      name: Routes.guideDetail,
+      page: () => const GuideDetailView(),
+      binding: GuideDetailBinding(),
     ),
   ];
 }
