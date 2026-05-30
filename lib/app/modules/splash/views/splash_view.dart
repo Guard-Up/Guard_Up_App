@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../constants/app_constants.dart';
 import '../controllers/splash_controller.dart';
 
 class SplashView extends GetView<SplashController> {
@@ -32,8 +33,8 @@ class SplashView extends GetView<SplashController> {
               Obx(
                 () => LinearProgressIndicator(
                   value: controller.progress.value,
-                  backgroundColor: const Color(0xFFE8E8E8),
-                  color: const Color(0xFF2969ED),
+                  backgroundColor: AppColors.surfaceElements,
+                  color: AppColors.primaryBlue,
                   borderRadius: BorderRadius.circular(4),
                   minHeight: 6,
                 ),
