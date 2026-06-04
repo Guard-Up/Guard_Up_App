@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
-import '../controllers/independece_support_controller.dart';
+import '../controllers/independence_support_controller.dart';
 
-class IndependeceSupportView extends GetView<IndependeceSupportController> {
-  const IndependeceSupportView({super.key});
+class IndependenceSupportView extends GetView<IndependenceSupportController> {
+  const IndependenceSupportView({super.key});
 
   @override
   Widget build(BuildContext context) {

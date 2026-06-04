@@ -61,7 +61,7 @@ class Issue {
     required this.clause,
     required this.reason,
     required this.severity,
-    this.isLegalBasis = false,
+    required this.isLegalBasis,
   });
 
   factory Issue.fromJson(Map<String, dynamic> json) {

@@ -13,15 +13,15 @@ class HomeView extends GetView<HomeController> {
       appBar: AppBar(
         title: const Text(
           '안심 계약 가디언',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textBlack),
         ),
         actions: [
           IconButton(
             onPressed: () {},
-            icon: const Icon(Icons.home, color: Colors.black),
+            icon: const Icon(Icons.home, color: AppColors.textBlack),
           ),
         ],
-        backgroundColor: Colors.white,
+        backgroundColor: AppColors.white,
         elevation: 0,
       ),
       body: Padding(
@@ -53,7 +53,7 @@ class HomeView extends GetView<HomeController> {
                   _menuCard(
                     '자립 지원 상담',
                     Icons.accessibility_new,
-                    controller.onIndependencesupportPressed,
+                    controller.onIndependenceSupportPressed,
                   ),
                   _menuCard(
                     '도움말&가이드',
@@ -88,7 +88,7 @@ class HomeView extends GetView<HomeController> {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

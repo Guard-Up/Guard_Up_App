@@ -6,5 +6,5 @@ class HomeController extends GetxController {
   void onHistoryPressed() => Get.toNamed(Routes.history);
   void onGuidePressed() => Get.toNamed(Routes.guide);
   void onHelpsupportPressed() => Get.toNamed(Routes.helpSupport);
-  void onIndependencesupportPressed() => Get.toNamed(Routes.independenceSupport);
+  void onIndependenceSupportPressed() => Get.toNamed(Routes.independenceSupport);
 }

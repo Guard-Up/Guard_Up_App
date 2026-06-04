@@ -1,5 +1,5 @@
 import 'package:get/get.dart';
 
-class IndependeceSupportController extends GetxController {
+class IndependenceSupportController extends GetxController {
   final isLoading = false.obs;
 }
