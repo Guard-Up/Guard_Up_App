@@ -20,8 +20,8 @@ import '../modules/guide_detail/bindings/guide_detail_binding.dart';
 import '../modules/guide_detail/views/guide_detail_view.dart';
 import '../modules/helpsupport/bindings/help_support_binding.dart';
 import '../modules/helpsupport/views/help_support_view.dart';
-import '../modules/independecesupport/bindings/independece_support_binding.dart';
-import '../modules/independecesupport/views/independece_support_view.dart';
+import '../modules/independencesupport/bindings/independence_support_binding.dart';
+import '../modules/independencesupport/views/independence_support_view.dart';
 
 class AppPages {
   AppPages._();
@@ -81,8 +81,8 @@ class AppPages {
     ),
     GetPage(
       name: Routes.independenceSupport,
-      page: () => const IndependeceSupportView(),
-      binding: IndependeceSupportBinding(),
+      page: () => const IndependenceSupportView(),
+      binding: IndependenceSupportBinding(),
     ),
   ];
 }
