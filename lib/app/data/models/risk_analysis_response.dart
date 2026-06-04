@@ -20,9 +20,9 @@ extension RiskLevelExt on RiskLevel {
   String get label {
     switch (this) {
       case RiskLevel.safe:
-        return '안전';
+        return '안심';
       case RiskLevel.caution:
-        return '보통';
+        return '주의';
       case RiskLevel.danger:
         return '위험';
     }

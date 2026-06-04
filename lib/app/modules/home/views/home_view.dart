@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
@@ -30,13 +29,6 @@ class HomeView extends GetView<HomeController> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Padding(
-              padding: EdgeInsets.all(8.0),
-              child: Text(
-                'Main tap',
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-              ),
-            ),
             Expanded(
               child: GridView.count(
                 crossAxisCount: 2,
@@ -68,13 +60,6 @@ class HomeView extends GetView<HomeController> {
                     Icons.help_outline,
                     controller.onGuidePressed,
                   ),
-                  // 디버그 빌드에서만 노출
-                  if (kDebugMode)
-                    _menuCard(
-                      '[테스트] 결과 화면',
-                      Icons.bug_report,
-                      controller.onResultTestPressed,
-                    ),
                 ],
               ),
             ),
