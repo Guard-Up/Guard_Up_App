@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
+
 enum RiskLevel { safe, caution, danger }
 
 extension RiskLevelExt on RiskLevel {
@@ -33,6 +36,17 @@ extension RiskLevelExt on RiskLevel {
         return '한번 더 검토하세요';
       case RiskLevel.danger:
         return '계약을 중지하세요';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case RiskLevel.safe:
+        return AppColors.safe;
+      case RiskLevel.caution:
+        return AppColors.caution;
+      case RiskLevel.danger:
+        return AppColors.danger;
     }
   }
 }
