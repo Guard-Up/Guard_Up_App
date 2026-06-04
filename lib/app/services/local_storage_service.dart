@@ -7,11 +7,27 @@ class LocalStorageService {
   Database? _db;
 
   Future<void> init() async {
+    if (_db != null) return;
     final path = join(await getDatabasesPath(), 'guard_up.db');
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: (db, version) async {
+        await db.execute('''
+          CREATE TABLE $_tableName (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            address TEXT NOT NULL,
+            score INTEGER NOT NULL,
+            level TEXT NOT NULL,
+            issues TEXT NOT NULL,
+            action_guide TEXT NOT NULL,
+            public_data TEXT NOT NULL,
+            created_at TEXT NOT NULL
+          )
+        ''');
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        await db.execute('DROP TABLE IF EXISTS $_tableName');
         await db.execute('''
           CREATE TABLE $_tableName (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
