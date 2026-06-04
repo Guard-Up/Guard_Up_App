@@ -10,4 +10,6 @@ abstract class Routes {
   static const guide = '/guide';
   static const guideQna = '/guide/qna';
   static const guideDetail = '/guide/detail';
+  static const helpSupport = '/help-support';
+  static const independenceSupport = '/independence-support';
 }

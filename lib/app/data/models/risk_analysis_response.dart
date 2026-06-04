@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import '../../constants/app_constants.dart';
+
 enum RiskLevel { safe, caution, danger }
 
 extension RiskLevelExt on RiskLevel {
@@ -35,17 +38,30 @@ extension RiskLevelExt on RiskLevel {
         return '계약을 중지하세요';
     }
   }
+
+  Color get color {
+    switch (this) {
+      case RiskLevel.safe:
+        return AppColors.safe;
+      case RiskLevel.caution:
+        return AppColors.caution;
+      case RiskLevel.danger:
+        return AppColors.danger;
+    }
+  }
 }
 
 class Issue {
   final String clause;
   final String reason;
   final int severity;
+  final bool isLegalBasis;
 
   const Issue({
     required this.clause,
     required this.reason,
     required this.severity,
+    this.isLegalBasis = false,
   });
 
   factory Issue.fromJson(Map<String, dynamic> json) {
@@ -53,6 +69,7 @@ class Issue {
       clause: json['clause'] as String,
       reason: json['reason'] as String,
       severity: json['severity'] as int,
+      isLegalBasis: json['is_legal_basis'] as bool? ?? false,
     );
   }
 
@@ -60,6 +77,7 @@ class Issue {
         'clause': clause,
         'reason': reason,
         'severity': severity,
+        'is_legal_basis': isLegalBasis,
       };
 }
 

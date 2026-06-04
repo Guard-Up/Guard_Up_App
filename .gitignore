@@ -49,3 +49,6 @@ app.*.map.json
 **/flutter/generated_plugin_registrant.h
 **/flutter/generated_plugins.cmake
 **/Flutter/GeneratedPluginRegistrant.swift
+
+# DevTools
+devtools_options.yaml

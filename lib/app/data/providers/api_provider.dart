@@ -26,6 +26,8 @@ class ApiProvider {
 
   Map<String, String> get _headers => {'Content-Type': 'application/json'};
 
+  void dispose() => _client.close();
+
   void _handleError(http.Response response) {
     if (response.statusCode >= 400) {
       final body = jsonDecode(response.body) as Map<String, dynamic>;

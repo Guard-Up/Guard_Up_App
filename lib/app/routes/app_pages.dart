@@ -18,6 +18,10 @@ import '../modules/guide_qna/bindings/guide_qna_binding.dart';
 import '../modules/guide_qna/views/guide_qna_view.dart';
 import '../modules/guide_detail/bindings/guide_detail_binding.dart';
 import '../modules/guide_detail/views/guide_detail_view.dart';
+import '../modules/helpsupport/bindings/help_support_binding.dart';
+import '../modules/helpsupport/views/help_support_view.dart';
+import '../modules/independecesupport/bindings/independece_support_binding.dart';
+import '../modules/independecesupport/views/independece_support_view.dart';
 
 class AppPages {
   AppPages._();
@@ -69,6 +73,16 @@ class AppPages {
       name: Routes.guideDetail,
       page: () => const GuideDetailView(),
       binding: GuideDetailBinding(),
+    ),
+    GetPage(
+      name: Routes.helpSupport,
+      page: () => const HelpSupportView(),
+      binding: HelpSupportBinding(),
+    ),
+    GetPage(
+      name: Routes.independenceSupport,
+      page: () => const IndependeceSupportView(),
+      binding: IndependeceSupportBinding(),
     ),
   ];
 }

@@ -20,8 +20,8 @@ class AppColors {
 
   // Risk levels
   static const Color safe = Color(0xFF2E7D32);
-  static const Color caution = Color(0xFFF9A825);
-  static const Color danger = Color(0xFFE53935);
+  static const Color caution = Color(0xFFFEBC2F);
+  static const Color danger = Color(0xFFBF3020);
 }
 
 class AppSpacing {
