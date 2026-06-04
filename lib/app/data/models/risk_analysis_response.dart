@@ -17,9 +17,9 @@ extension RiskLevelExt on RiskLevel {
   String get label {
     switch (this) {
       case RiskLevel.safe:
-        return '안전';
+        return '안심';
       case RiskLevel.caution:
-        return '보통';
+        return '주의';
       case RiskLevel.danger:
         return '위험';
     }
@@ -41,11 +41,13 @@ class Issue {
   final String clause;
   final String reason;
   final int severity;
+  final bool isLegalBasis;
 
   const Issue({
     required this.clause,
     required this.reason,
     required this.severity,
+    required this.isLegalBasis,
   });
 
   factory Issue.fromJson(Map<String, dynamic> json) {
@@ -53,6 +55,7 @@ class Issue {
       clause: json['clause'] as String,
       reason: json['reason'] as String,
       severity: json['severity'] as int,
+      isLegalBasis: json['is_legal_basis'] as bool,
     );
   }
 
@@ -60,6 +63,7 @@ class Issue {
         'clause': clause,
         'reason': reason,
         'severity': severity,
+        'is_legal_basis': isLegalBasis,
       };
 }
 
