@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'app/constants/app_constants.dart';
 import 'app/routes/app_pages.dart';
+import 'app/services/local_storage_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  Get.put(LocalStorageService(), permanent: true);
+  await Get.find<LocalStorageService>().init();
   runApp(const GuardUpApp());
 }
 
