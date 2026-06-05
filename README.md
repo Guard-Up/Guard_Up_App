@@ -1,50 +1,51 @@
-# Guard Up App
+# GuardUp (안심계약 가디언)
 
-> 한이음 드림업 사회공헌 프로젝트 — **안심 계약 가디언**
-
-자립준비청년을 위한 전세 계약서 AI 분석 모바일 앱
+자립준비청년을 위한 AI 기반 임대차 계약서 분석 앱
 
 ---
 
 ## 프로젝트 소개
 
-전세 계약 경험이 부족한 자립준비청년이 계약서를 직접 촬영하면, AI가 위험 조항을 분석하여 안심/주의/위험 3단계로 결과를 제공합니다. 복잡한 법률 용어 없이 누구나 쉽게 계약서 리스크를 파악할 수 있도록 돕는 것이 목표입니다.
+계약서 사진 한 장으로 독소 조항과 리스크를 자동 분석해주는 서비스입니다.
+법률 지식이 없는 청년들도 계약 전 위험 요소를 쉽게 파악할 수 있습니다.
+
+---
+
+## 시작하기
+
+### 요구 사항
+
+- Flutter SDK 3.x 이상
+- Dart SDK 3.x 이상
+- Android Studio 또는 VSCode (Flutter/Dart 플러그인 설치)
+- Android 에뮬레이터 또는 실제 기기
+
+### 설치 및 실행
+
+```bash
+# 1. 저장소 클론
+git clone <repo-url>
+cd guard_up_app
+
+# 2. 패키지 설치
+flutter pub get
+
+# 3. 앱 실행
+flutter run
+```
 
 ---
 
 ## 기술 스택
 
-| 분류 | 기술 |
-|------|------|
-| 프레임워크 | Flutter |
-| 상태 관리 | GetX |
-| 언어 | Dart |
-| 백엔드 연동 | HTTP (FastAPI) |
-
----
-
-## 개발 환경 버전
-
-> 팀원 간 버전을 반드시 통일해야 합니다.
-
-| 항목 | 버전 |
-|------|------|
-| Flutter | 3.38.5 (stable) |
-| Dart | 3.10.4 |
-| Android SDK | 35.0.0 |
-| Android Gradle Plugin (AGP) | 8.11.1 |
-| Kotlin | 2.2.20 |
-| Java (JDK) | 17.0.18 (Temurin) |
-| Xcode (iOS) | 15.2 |
-
----
-
-## 주요 화면
-
-- **메인 화면** — 앱 시작 및 안내
-- **계약서 촬영 화면** — 카메라로 계약서 스캔
-- **분석 결과 화면** — 안심 / 주의 / 위험 3단계 결과 표시
-- **액션 가이드 화면** — 위험 항목별 대처 방법 안내
+| 분류 | 사용 기술 |
+|------|----------|
+| Framework | Flutter |
+| 상태관리 | GetX |
+| 로컬 DB | sqflite |
+| HTTP 통신 | http |
+| 이미지 선택 | image_picker |
+| 로컬 저장소 | shared_preferences, path_provider |
 
 ---
 
@@ -54,83 +55,82 @@
 lib/
 ├── main.dart
 └── app/
-    ├── modules/          # 화면별 모듈 (GetX)
-    │   └── home/
-    │       ├── bindings/
-    │       ├── controllers/
-    │       └── views/
-    └── routes/           # 앱 라우팅
+    ├── constants/
+    │   ├── app_constants.dart       # 색상, 여백 상수
+    │   └── api_constants.dart       # API 엔드포인트
+    ├── data/
+    │   ├── models/                  # 데이터 모델
+    │   │   ├── risk_analysis_response.dart
+    │   │   ├── history_item.dart
+    │   │   ├── analyze_image_response.dart
+    │   │   ├── verify_address_response.dart
+    │   │   └── building_response.dart
+    │   └── providers/
+    │       └── api_provider.dart    # API 통신
+    ├── services/
+    │   └── local_storage_service.dart  # 분석 이력 저장
+    ├── routes/
+    │   ├── app_routes.dart          # 라우트 경로 상수
+    │   └── app_pages.dart           # 라우트 등록
+    └── modules/
+        ├── splash/                  # 스플래시 화면
+        ├── home/                    # 홈 화면
+        ├── scan/                    # 계약서 촬영
+        ├── analyzing/               # AI 분석 중
+        ├── result/                  # 분석 결과
+        ├── history/                 # 분석 이력
+        └── guide/                   # 상담 안내
 ```
+
+각 모듈은 `views/` · `controllers/` · `bindings/` 로 구성됩니다.
 
 ---
 
-## 팀 구성
+## 화면 구성
 
-| 역할 | 담당자 |
-|------|--------|
-| 프론트엔드 (Flutter + Figma) | 해빈 |
+| 화면 | 설명 |
+|------|------|
+| Splash | 앱 시작 화면, 2초 후 홈으로 이동 |
+| Home | 메인 화면, 계약서 분석 시작 |
+| Scan | 카메라/갤러리로 계약서 촬영 |
+| Analyzing | AI 분석 진행 중 화면 (4단계) |
+| Result | 리스크 분석 결과 (안전/주의/위험) |
+| History | 이전 분석 이력 목록 |
+| Guide | 자립 상담 및 피해 신고 안내 |
 
 ---
 
 ## Git 브랜치 전략
 
 ```
-main      → 배포용 (최종 안정 버전)
-develop   → 개발 통합 브랜치
-feature/* → 기능별 개발 브랜치
+main        → 배포용 (직접 푸시 금지)
+develop     → 통합 브랜치
+feature/*   → 기능 개발 (예: feature/home-view)
 ```
 
-- 모든 작업은 `feature/*` 브랜치에서 진행
-- PR 필수, 팀장 승인 후 `develop`에 머지
+### 작업 흐름
 
----
-
-## 시작하기
-
-### 사전 준비 (최초 1회)
-
-**1. Flutter 설치 및 버전 확인**
 ```bash
-flutter --version
-# Flutter 3.38.5 이어야 함
-# 다르면: flutter upgrade
-```
+# 1. develop 최신화
+git checkout develop
+git pull origin develop
 
-**2. Android cmdline-tools 설치**
+# 2. feature 브랜치 생성
+git checkout -b feature/화면이름
 
-`https://developer.android.com/studio#command-line-tools-only` 에서 macOS용 zip 다운로드 후:
-```bash
-mkdir -p ~/Library/Android/sdk/cmdline-tools/latest
-cp -r ~/Downloads/cmdline-tools/* ~/Library/Android/sdk/cmdline-tools/latest/
-```
+# 3. 작업 후 커밋
+git add .
+git commit -m "feat: 홈 화면 UI 구현"
 
-**3. 환경변수 설정 (~/.zshrc)**
-```bash
-echo 'export ANDROID_HOME=$HOME/Library/Android/sdk' >> ~/.zshrc
-echo 'export PATH=$PATH:$ANDROID_HOME/cmdline-tools/latest/bin' >> ~/.zshrc
-source ~/.zshrc
-```
-
-**4. Android 라이선스 동의**
-```bash
-flutter doctor --android-licenses
-# 모두 y 입력 (한영 전환 확인!)
-```
-
-**5. 환경 확인**
-```bash
-flutter doctor
-# [✓] Flutter, [✓] Android toolchain 확인
+# 4. PR 생성 (feature → develop)
+git push origin feature/화면이름
 ```
 
 ---
 
-### 프로젝트 실행
+## 개발 규칙
 
-```bash
-# 의존성 설치
-flutter pub get
-
-# 앱 실행
-flutter run
-```
+- 아키텍처 및 코딩 컨벤션은 [CLAUDE.md](CLAUDE.md) 참고
+- View 파일만 수정 (Controller/Binding/Model은 팀장이 관리)
+- `print()` 대신 Logger 사용
+- 매직 넘버 사용 금지 → `app_constants.dart`에 상수로 정의
