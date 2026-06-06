@@ -1,11 +1,10 @@
 import 'package:get/get.dart';
+import '../../../routes/app_routes.dart';
 
 class HomeController extends GetxController {
-  //TODO: Implement HomeController
-
-  final count = 0.obs;
-
-
-
-  void increment() => count.value++;
+  void onScanPressed() => Get.toNamed(Routes.analyzing);
+  void onHistoryPressed() => Get.toNamed(Routes.history);
+  void onGuidePressed() => Get.toNamed(Routes.guide);
+  void onHelpsupportPressed() => Get.toNamed(Routes.helpSupport);
+  void onIndependenceSupportPressed() => Get.toNamed(Routes.independenceSupport);
 }
