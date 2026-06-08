@@ -6,30 +6,25 @@ import 'package:get/get.dart';
 class HelpSupportView extends GetView<HelpSupportController> {
   const HelpSupportView({super.key});
 
+  // 자립상담과 동일한 박스 색
   static const _cardColor = Color(0xFFEFEFEF);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바 ──
+      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 (자립상담과 동일) ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
         titleSpacing: AppSpacing.contentHorizontal,
-        title: Row(
-          children: [
-            Image.asset('assets/images/shield.png', width: 28, height: 28),
-            const SizedBox(width: 8),
-            const Text(
-              '안심 계약 가디언',
-              style: TextStyle(
-                color: AppColors.textBlack,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+        title: const Text(
+          '피해 상담',
+          style: TextStyle(
+            color: AppColors.textBlack,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         actions: [
           IconButton(
@@ -151,7 +146,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
     );
   }
 
-  // ── 국토부 연결 링크─────────────
+  // ── 국토부 연결 링크 (탭하면 웹페이지 열림) ──────────────
   Widget _buildMolitLink() {
     return InkWell(
       onTap: controller.openMolitWebsite,
@@ -165,6 +160,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
         ),
         child: Row(
           children: [
+            // 정부 로고 대용 아이콘 (정부 상징 이미지가 있으면 Image.asset 으로 교체)
             Container(
               width: 36,
               height: 36,
@@ -298,7 +294,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   }
 }
 
-// ── 하단 네비게이션 바──────────────────
+// ── 하단 네비게이션 바 (자립상담과 동일) ──────────────────
 class _BottomNav extends StatelessWidget {
   final HelpSupportController controller;
   const _BottomNav({required this.controller});

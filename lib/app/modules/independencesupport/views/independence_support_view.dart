@@ -15,24 +15,18 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바 ──
+      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
         titleSpacing: AppSpacing.contentHorizontal,
-        title: Row(
-          children: [
-            Image.asset('assets/images/shield.png', width: 28, height: 28),
-            const SizedBox(width: 8),
-            const Text(
-              '안심 계약 가디언',
-              style: TextStyle(
-                color: AppColors.textBlack,
-                fontSize: 20,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ],
+        title: const Text(
+          '자립 지원 상담',
+          style: TextStyle(
+            color: AppColors.textBlack,
+            fontSize: 20,
+            fontWeight: FontWeight.w800,
+          ),
         ),
         actions: [
           IconButton(
@@ -240,7 +234,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 로딩 박스  ─────
+  // ── 로딩 박스 (시안: 가운데 진회색 박스 + 흰 스피너) ─────
   Widget _loadingBox() {
     return Center(
       child: Container(
@@ -283,7 +277,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 결과 박스  ──
+  // ── 결과 박스 (시안: 회색 박스 + 주소/웹사이트/전화번호) ──
   Widget _resultBox(SupportOrg org) {
     return Container(
       width: double.infinity,
@@ -304,6 +298,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
             ),
           ),
           const SizedBox(height: 6),
+          // 웹사이트 : OOO - 바로가기(탭하면 복사)
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
