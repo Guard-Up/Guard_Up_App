@@ -13,7 +13,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 (자립상담과 동일) ──
+      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -72,7 +72,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
           ],
         ),
       ),
-      // ── 하단 네비게이션 (자립상담과 동일) ──
+      // ── 하단 네비게이션 ──
       bottomNavigationBar: _BottomNav(controller: controller),
     );
   }
@@ -146,7 +146,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
     );
   }
 
-  // ── 국토부 연결 링크 (탭하면 웹페이지 열림) ──────────────
+  // ── 국토부 연결 링크──────────────
   Widget _buildMolitLink() {
     return InkWell(
       onTap: controller.openMolitWebsite,
@@ -160,7 +160,6 @@ class HelpSupportView extends GetView<HelpSupportController> {
         ),
         child: Row(
           children: [
-            // 정부 로고 대용 아이콘 (정부 상징 이미지가 있으면 Image.asset 으로 교체)
             Container(
               width: 36,
               height: 36,
@@ -258,7 +257,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
                   ),
                 ),
                 const SizedBox(height: 6),
-                // 본문(여러 줄)을 점 항목으로 표시
+
                 ...body.split('\n').map(
                       (line) => Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 4),
@@ -294,7 +293,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   }
 }
 
-// ── 하단 네비게이션 바 (자립상담과 동일) ──────────────────
+// ── 하단 네비게이션 바──────────────────
 class _BottomNav extends StatelessWidget {
   final HelpSupportController controller;
   const _BottomNav({required this.controller});

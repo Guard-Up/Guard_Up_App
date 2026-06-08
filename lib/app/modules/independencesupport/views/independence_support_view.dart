@@ -15,7 +15,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 ──
+      // ── 상단바──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -53,7 +53,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           ],
         ),
       ),
-      // ── 하단 네비게이션: 기록 / 촬영 / 사용자 ──
+      // ── 하단 네비게이션 ──
       bottomNavigationBar: _BottomNav(controller: controller),
     );
   }
@@ -84,7 +84,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           ),
           const SizedBox(height: 16),
           _buildSearchRow(),
-          // 결과 영역 (로딩 / 기관 목록 / 추가 예정 안내)
+
           Obx(() {
             // 1) 로딩 중
             if (controller.isLoading.value) {
@@ -109,7 +109,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                 ),
               );
             }
-            // 3) 조회는 했지만 데이터가 없으면 "추가 예정" 안내
+            // 3) 조회 데이터 없음
             if (controller.hasSearched.value) {
               return Padding(
                 padding: const EdgeInsets.only(top: 16),
@@ -128,7 +128,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
   Widget _buildSearchRow() {
     return Row(
       children: [
-        // 시 선택 (MenuAnchor: 목록이 칸 바로 아래에 좁게 떨어짐 → 화면 안 가림)
+        // 시 선택
         MenuAnchor(
           style: MenuStyle(
             backgroundColor: WidgetStateProperty.all(AppColors.white),
@@ -205,7 +205,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           style: TextStyle(fontSize: 16, color: AppColors.textBlack),
         ),
         const Spacer(),
-        // 조회 버튼 (시안: 흰 배경 + 테두리 + "조회 🔍")
+        // 조회 버튼 
         OutlinedButton(
           onPressed: controller.onSearch,
           style: OutlinedButton.styleFrom(
@@ -234,7 +234,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 로딩 박스 (시안: 가운데 진회색 박스 + 흰 스피너) ─────
+  // ── 로딩 박스  ─────
   Widget _loadingBox() {
     return Center(
       child: Container(
@@ -277,7 +277,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 결과 박스 (시안: 회색 박스 + 주소/웹사이트/전화번호) ──
+  // ── 결과 박스 ──
   Widget _resultBox(SupportOrg org) {
     return Container(
       width: double.infinity,
@@ -298,7 +298,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
             ),
           ),
           const SizedBox(height: 6),
-          // 웹사이트 : OOO - 바로가기(탭하면 복사)
+
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
@@ -371,7 +371,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 전문 상담 기관 카드 (고정 내용) ─────────────────────
+  // ── 전문 상담 기관 카드 ─────────────────────
   Widget _buildProOrgCard() {
     const orgs = [
       ['소비자보호원', '1372', ''],
