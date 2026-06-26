@@ -5,6 +5,7 @@ import '../models/analyze_image_response.dart';
 import '../models/verify_address_response.dart';
 import '../models/building_response.dart';
 import '../models/risk_analysis_response.dart';
+import '../models/institution_response.dart';
 
 class ApiException implements Exception {
   final String errorCode;
@@ -37,6 +38,21 @@ class ApiProvider {
         message: body['message'] as String? ?? 'Unknown error occurred',
       );
     }
+  }
+
+  // 자립지원 전담기관 조회 (지역별)
+  Future<InstitutionResponse> getInstitution(String region) async {
+    final response = await _client
+        .post(
+          Uri.parse('${ApiConstants.baseUrl}${ApiConstants.institution}'),
+          headers: _headers,
+          body: jsonEncode({'region': region}),
+        )
+        .timeout(ApiConstants.requestTimeout);
+ 
+    _handleError(response);
+    return InstitutionResponse.fromJson(
+        jsonDecode(response.body) as Map<String, dynamic>);
   }
 
   // 1단계: 계약서 이미지 분석

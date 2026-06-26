@@ -1,21 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
+import '../../../data/models/institution_response.dart';
 import '../controllers/independence_support_controller.dart';
 
 class IndependenceSupportView extends GetView<IndependenceSupportController> {
   const IndependenceSupportView({super.key});
 
-  // 시안에 맞춘 박스 색상
-  static const _cardColor = Color(0xFFEFEFEF); // 섹션 카드 (연회색)
-  static const _resultColor = Color(0xFFBDBDBD); // 결과 박스 (중간 회색)
-  static const _loadingColor = Color(0xFF8A8A8A); // 로딩 박스 (진회색)
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바──
+      // ── 상단바: 제목 + 홈 버튼 ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -53,7 +49,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           ],
         ),
       ),
-      // ── 하단 네비게이션 ──
+      // ── 하단 네비게이션: 기록 / 촬영 / 사용자 ──
       bottomNavigationBar: _BottomNav(controller: controller),
     );
   }
@@ -63,7 +59,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _cardColor,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -84,7 +80,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           ),
           const SizedBox(height: 16),
           _buildSearchRow(),
-
+          // 결과 영역 (로딩 / 기관 목록 / 추가 예정 안내)
           Obx(() {
             // 1) 로딩 중
             if (controller.isLoading.value) {
@@ -109,11 +105,11 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                 ),
               );
             }
-            // 3) 조회 데이터 없음
-            if (controller.hasSearched.value) {
+            // 3) 조회는 했지만 데이터가 없으면 "추가 예정" 안내
+            if (controller.showEmptyNotice) {
               return Padding(
                 padding: const EdgeInsets.only(top: 16),
-                child: _noticeBox(controller.searchedCity.value ?? ''),
+                child: _noticeBox(controller.emptyNoticeText),
               );
             }
             // 4) 아직 조회 전 → 아무것도 안 보임
@@ -124,16 +120,14 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 시 선택 + 조회 줄 ───────────────────────────────────
+  // ── 지역 선택 + 조회 줄 ─────────────────────────────────
   Widget _buildSearchRow() {
     return Row(
       children: [
-        // 시 선택
         MenuAnchor(
           style: MenuStyle(
             backgroundColor: WidgetStateProperty.all(AppColors.white),
-            maximumSize:
-                WidgetStateProperty.all(const Size.fromHeight(300)),
+            maximumSize: WidgetStateProperty.all(const Size.fromHeight(300)),
             shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
@@ -141,16 +135,16 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
               ),
             ),
           ),
-          menuChildren: controller.cities
+          menuChildren: controller.regions
               .map(
-                (c) => SizedBox(
-                  width: 120,
+                (r) => SizedBox(
+                  width: 150,
                   child: MenuItemButton(
-                    onPressed: () => controller.selectedCity.value = c,
+                    onPressed: () => controller.selectedRegion.value = r,
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        c,
+                        r,
                         style: const TextStyle(
                           fontSize: 14,
                           color: AppColors.textBlack,
@@ -168,9 +162,9 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                   ? menuController.close()
                   : menuController.open(),
               child: Container(
-                width: 120,
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 8),
+                width: 150,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
                   color: AppColors.white,
                   border: Border.all(color: AppColors.borderLine),
@@ -181,11 +175,11 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                     Expanded(
                       child: Obx(
                         () => Text(
-                          controller.selectedCity.value ?? '선택',
+                          controller.selectedRegion.value ?? '지역 선택',
                           overflow: TextOverflow.ellipsis,
                           style: TextStyle(
                             fontSize: 14,
-                            color: controller.selectedCity.value == null
+                            color: controller.selectedRegion.value == null
                                 ? AppColors.textDisable
                                 : AppColors.textBlack,
                           ),
@@ -199,13 +193,8 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
             );
           },
         ),
-        const SizedBox(width: 8),
-        const Text(
-          '시',
-          style: TextStyle(fontSize: 16, color: AppColors.textBlack),
-        ),
         const Spacer(),
-        // 조회 버튼 
+        // 조회 버튼
         OutlinedButton(
           onPressed: controller.onSearch,
           style: OutlinedButton.styleFrom(
@@ -234,23 +223,23 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 로딩 박스  ─────
+  // ── 로딩 박스 ─────────────────────
   Widget _loadingBox() {
     return Center(
       child: Container(
         width: 200,
         height: 110,
         decoration: BoxDecoration(
-          color: _loadingColor,
+          color: AppColors.surfaceElements,
           borderRadius: BorderRadius.circular(8),
         ),
         alignment: Alignment.center,
         child: const SizedBox(
-          width: 36,
-          height: 36,
+          width: 30,
+          height: 30,
           child: CircularProgressIndicator(
             strokeWidth: 3,
-            valueColor: AlwaysStoppedAnimation(Colors.white),
+            color: AppColors.primaryBlue,
           ),
         ),
       ),
@@ -258,16 +247,16 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
   }
 
   // ── "추가 예정" 안내 박스 ───────────────────────────────
-  Widget _noticeBox(String city) {
+  Widget _noticeBox(String text) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _resultColor,
+        color: AppColors.surfaceElements,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        '$city의 자립 상담 기관은 추가 예정입니다.',
+        text,
         style: const TextStyle(
           fontSize: 14,
           color: AppColors.textBlack,
@@ -277,51 +266,34 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 결과 박스 ──
-  Widget _resultBox(SupportOrg org) {
+  // ── 결과 박스 ──────────
+  Widget _resultBox(InstitutionItem item) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: _resultColor,
+        color: AppColors.surfaceElements,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '주소 : ${org.address}',
+            item.name,
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textBlack,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '주소 : ${item.address}',
             style: const TextStyle(
               fontSize: 13,
               color: AppColors.textBlack,
               height: 1.5,
             ),
-          ),
-          const SizedBox(height: 6),
-
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              Text(
-                '웹사이트 : ${org.websiteLabel} - ',
-                style: const TextStyle(
-                  fontSize: 13,
-                  color: AppColors.textBlack,
-                ),
-              ),
-              GestureDetector(
-                onTap: () => controller.copyWebsite(org.websiteUrl),
-                child: const Text(
-                  '바로가기',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: AppColors.primaryBlue,
-                    fontWeight: FontWeight.w600,
-                    decoration: TextDecoration.underline,
-                  ),
-                ),
-              ),
-            ],
           ),
           const SizedBox(height: 6),
           Wrap(
@@ -332,9 +304,9 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                 style: TextStyle(fontSize: 13, color: AppColors.textBlack),
               ),
               GestureDetector(
-                onTap: () => controller.callNumber(org.phone),
+                onTap: () => controller.callNumber(item.phone),
                 child: Text(
-                  org.phone,
+                  item.phone,
                   style: const TextStyle(
                     fontSize: 13,
                     color: AppColors.primaryBlue,
@@ -371,20 +343,12 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 전문 상담 기관 카드 ─────────────────────
+  // ── 전문 상담 기관 카드  ─────────────────────
   Widget _buildProOrgCard() {
-    const orgs = [
-      ['소비자보호원', '1372', ''],
-      ['주거복지재단', '1600-0777', ''],
-      ['대한법률구조공단', '132', '(무료 법률 상담)'],
-      ['대한변호사협회 법률구조재단', '02-3476-6515', ''],
-      ['법률홈닥터', '132', '(주거 관련 무료 법률 상담)'],
-    ];
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _cardColor,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -399,7 +363,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
             ),
           ),
           const SizedBox(height: 14),
-          ...orgs.map(
+          ...kProOrgs.map(
             (o) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
@@ -407,7 +371,8 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                 children: [
                   const Padding(
                     padding: EdgeInsets.only(top: 6),
-                    child: Icon(Icons.circle, size: 5, color: AppColors.textBlack),
+                    child:
+                        Icon(Icons.circle, size: 5, color: AppColors.textBlack),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
@@ -415,19 +380,20 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                       crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Text(
-                          o[0],
+                          o.name,
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textBlack,
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Icon(Icons.phone, size: 15, color: AppColors.danger),
+                        const Icon(Icons.phone,
+                            size: 15, color: AppColors.negative),
                         const SizedBox(width: 4),
                         GestureDetector(
-                          onTap: () => controller.callNumber(o[1]),
+                          onTap: () => controller.callNumber(o.phone),
                           child: Text(
-                            o[1],
+                            o.phone,
                             style: const TextStyle(
                               fontSize: 14,
                               color: AppColors.primaryBlue,
@@ -436,10 +402,10 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
                             ),
                           ),
                         ),
-                        if (o[2].isNotEmpty) ...[
+                        if (o.note.isNotEmpty) ...[
                           const SizedBox(width: 4),
                           Text(
-                            o[2],
+                            o.note,
                             style: const TextStyle(
                               fontSize: 13,
                               color: AppColors.textSub,
@@ -458,6 +424,24 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 }
+
+/// 전문 상담 기관
+class ProOrg {
+  final String name; // 기관명
+  final String phone; // 전화번호
+  final String note; // 부가 설명
+
+  const ProOrg({required this.name, required this.phone, this.note = ''});
+}
+
+/// 전문 상담 기관 고정 목록
+const List<ProOrg> kProOrgs = [
+  ProOrg(name: '소비자보호원', phone: '1372'),
+  ProOrg(name: '주거복지재단', phone: '1600-0777'),
+  ProOrg(name: '대한법률구조공단', phone: '132', note: '(무료 법률 상담)'),
+  ProOrg(name: '대한변호사협회 법률구조재단', phone: '02-3476-6515'),
+  ProOrg(name: '법률홈닥터', phone: '132', note: '(주거 관련 무료 법률 상담)'),
+];
 
 // ── 하단 네비게이션 바 ────────────────────────────────────
 class _BottomNav extends StatelessWidget {
@@ -479,17 +463,20 @@ class _BottomNav extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               IconButton(
-                icon: const Icon(Icons.segment, size: 28, color: AppColors.textBlack),
+                icon: const Icon(Icons.segment,
+                    size: 28, color: AppColors.textBlack),
                 tooltip: '최근 기록',
                 onPressed: controller.onHistoryPressed,
               ),
               IconButton(
-                icon: const Icon(Icons.photo_camera_outlined, size: 30, color: AppColors.textBlack),
+                icon: const Icon(Icons.photo_camera_outlined,
+                    size: 30, color: AppColors.textBlack),
                 tooltip: '계약서 촬영',
                 onPressed: controller.onScanPressed,
               ),
               IconButton(
-                icon: const Icon(Icons.person_outline, size: 28, color: AppColors.primaryBlue),
+                icon: const Icon(Icons.person_outline,
+                    size: 28, color: AppColors.primaryBlue),
                 tooltip: '사용자',
                 onPressed: controller.onUserPressed,
               ),

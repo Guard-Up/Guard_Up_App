@@ -6,14 +6,11 @@ import 'package:get/get.dart';
 class HelpSupportView extends GetView<HelpSupportController> {
   const HelpSupportView({super.key});
 
-  // 자립상담과 동일한 박스 색
-  static const _cardColor = Color(0xFFEFEFEF);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 ──
+      // ── 상단바 ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -72,24 +69,18 @@ class HelpSupportView extends GetView<HelpSupportController> {
           ],
         ),
       ),
-      // ── 하단 네비게이션 ──
+      // ── 하단 네비게이션 (자립상담과 동일) ──
       bottomNavigationBar: _BottomNav(controller: controller),
     );
   }
 
   // ── 피해 상담 기관 카드 ─────────────────────────────────
   Widget _buildAgencyCard() {
-    const agencies = [
-      ['경찰청', '112'],
-      ['LH콜센터', '1600-1004'],
-      ['전세피해지원센터', '1533-8119'],
-    ];
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: _cardColor,
+        color: AppColors.surfaceDefault,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
@@ -104,7 +95,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
             ),
           ),
           const SizedBox(height: 14),
-          ...agencies.map(
+          ...kHelpAgencies.map(
             (a) => Padding(
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
@@ -116,19 +107,19 @@ class HelpSupportView extends GetView<HelpSupportController> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    a[0],
+                    a.name,
                     style: const TextStyle(
                       fontSize: 15,
                       color: AppColors.textBlack,
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Icon(Icons.phone, size: 16, color: AppColors.danger),
+                  const Icon(Icons.phone, size: 16, color: AppColors.negative),
                   const SizedBox(width: 4),
                   GestureDetector(
-                    onTap: () => controller.callNumber(a[1]),
+                    onTap: () => controller.callNumber(a.phone),
                     child: Text(
-                      a[1],
+                      a.phone,
                       style: const TextStyle(
                         fontSize: 15,
                         color: AppColors.primaryBlue,
@@ -146,7 +137,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
     );
   }
 
-  // ── 국토부 연결 링크──────────────
+  // ── 국토부 연결 링크  ──────────────
   Widget _buildMolitLink() {
     return InkWell(
       onTap: controller.openMolitWebsite,
@@ -155,11 +146,12 @@ class HelpSupportView extends GetView<HelpSupportController> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         decoration: BoxDecoration(
-          color: _cardColor,
+          color: AppColors.surfaceDefault,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
+            // 정부 로고 대용 아이콘 (정부 상징 이미지가 있으면 Image.asset 으로 교체)
             Container(
               width: 36,
               height: 36,
@@ -257,7 +249,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
                   ),
                 ),
                 const SizedBox(height: 6),
-
+                // 본문(여러 줄)을 점 항목으로 표시
                 ...body.split('\n').map(
                       (line) => Padding(
                         padding: const EdgeInsets.only(left: 4, bottom: 4),
@@ -293,7 +285,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   }
 }
 
-// ── 하단 네비게이션 바──────────────────
+// ── 하단 네비게이션 바 ──────────────────
 class _BottomNav extends StatelessWidget {
   final HelpSupportController controller;
   const _BottomNav({required this.controller});
@@ -334,3 +326,18 @@ class _BottomNav extends StatelessWidget {
     );
   }
 }
+
+/// 피해 상담 기관
+class Agency {
+  final String name; // 기관명
+  final String phone; // 전화번호
+
+  const Agency({required this.name, required this.phone});
+}
+
+/// 피해 상담 기관 고정 목록
+const List<Agency> kHelpAgencies = [
+  Agency(name: '경찰청', phone: '112'),
+  Agency(name: 'LH콜센터', phone: '1600-1004'),
+  Agency(name: '전세피해지원센터', phone: '1533-8119'),
+];
