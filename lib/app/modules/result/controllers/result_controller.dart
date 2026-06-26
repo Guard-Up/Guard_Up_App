@@ -117,6 +117,7 @@ class ResultController extends GetxController {
   void onBackPressed() => Get.offAllNamed(Routes.home);
   void onScanPressed() => Get.toNamed(Routes.analyzing);
   void onHistoryPressed() => Get.toNamed(Routes.history);
+  void onHelpSupportPressed() => Get.toNamed(Routes.helpSupport);
 
   // TODO: 테스트용 — 배포 전 제거
   void onResultTestPressed() => Get.toNamed(Routes.result);
