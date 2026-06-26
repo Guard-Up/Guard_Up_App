@@ -59,17 +59,58 @@ class ResultView extends GetView<ResultController> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          IconButton(
-            onPressed: controller.onHistoryPressed,
-            icon: const Icon(Icons.menu, color: AppColors.textBlack),
+          _BottomNavItem(
+            icon: Icons.menu_rounded,
+            label: '기록',
+            onTap: controller.onHistoryPressed,
           ),
-          IconButton(
-            onPressed: controller.onScanPressed,
-            icon: const Icon(Icons.camera_alt_outlined, color: AppColors.textBlack),
+          _BottomNavItem(
+            icon: Icons.camera_alt_outlined,
+            label: '분석',
+            isActive: true,
+            onTap: controller.onScanPressed,
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.person_outline, color: AppColors.textBlack),
+          _BottomNavItem(
+            icon: Icons.person_outline,
+            label: '상담',
+            onTap: controller.onHelpSupportPressed,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BottomNavItem extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+
+  const _BottomNavItem({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    this.isActive = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isActive ? AppColors.primaryBlue : AppColors.textDisable;
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, color: color, size: 26),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 11,
+              color: color,
+              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+            ),
           ),
         ],
       ),

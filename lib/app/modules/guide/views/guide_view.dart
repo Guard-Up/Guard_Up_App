@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
+import '../../../widgets/app_bottom_nav.dart';
 import '../controllers/guide_controller.dart';
 
 class GuideView extends GetView<GuideController> {
@@ -34,7 +35,7 @@ class GuideView extends GetView<GuideController> {
                 _AccordionSection(
                   icon: '⚠️',
                   title: '분석 서비스 한계 안내',
-                  isExpanded: controller.expandedSection.value == 0,
+                  isExpanded: controller.isSectionExpanded(0),
                   onTap: () => controller.onSectionPressed(0),
                   child: const _LimitationContent(),
                 ),
@@ -42,7 +43,7 @@ class GuideView extends GetView<GuideController> {
                 _AccordionSection(
                   icon: '📋',
                   title: '계약 체크리스트',
-                  isExpanded: controller.expandedSection.value == 1,
+                  isExpanded: controller.isSectionExpanded(1),
                   onTap: () => controller.onSectionPressed(1),
                   child: const _ChecklistContent(),
                 ),
@@ -50,14 +51,14 @@ class GuideView extends GetView<GuideController> {
                 _AccordionSection(
                   icon: '💡',
                   title: '알아두면 좋은 정보',
-                  isExpanded: controller.expandedSection.value == 2,
+                  isExpanded: controller.isSectionExpanded(2),
                   onTap: () => controller.onSectionPressed(2),
                   child: const _FaqContent(),
                 ),
               ],
             )),
       ),
-      bottomNavigationBar: const _BottomNav(),
+      bottomNavigationBar: const AppBottomNav(),
     );
   }
 }
@@ -399,24 +400,3 @@ class _DashedDivider extends StatelessWidget {
   }
 }
 
-class _BottomNav extends StatelessWidget {
-  const _BottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        border: Border(top: BorderSide(color: AppColors.borderLine)),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
-          Icon(Icons.menu, color: AppColors.textBlack),
-          Icon(Icons.camera_alt_outlined, color: AppColors.textBlack),
-          Icon(Icons.person_outline, color: AppColors.textBlack),
-        ],
-      ),
-    );
-  }
-}

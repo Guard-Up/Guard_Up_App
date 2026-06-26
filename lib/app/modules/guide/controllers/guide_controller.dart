@@ -64,7 +64,8 @@ class LimitationLink {
 }
 
 class GuideController extends GetxController {
-  final expandedSection = RxnInt(0);
+  // 여러 섹션을 동시에 펼칠 수 있도록 Set으로 관리 (처음엔 0번 열림)
+  final expandedSections = <int>{0}.obs;
   final selectedStage = ChecklistStage.before.obs;
   final checkedItems = <String>{}.obs;
 
@@ -103,8 +104,14 @@ class GuideController extends GetxController {
     _persistCheckedItems();
   }
 
+  bool isSectionExpanded(int index) => expandedSections.contains(index);
+
   void onSectionPressed(int index) {
-    expandedSection.value = expandedSection.value == index ? null : index;
+    if (expandedSections.contains(index)) {
+      expandedSections.remove(index);
+    } else {
+      expandedSections.add(index);
+    }
   }
 
   void onStagePressed(ChecklistStage stage) {
