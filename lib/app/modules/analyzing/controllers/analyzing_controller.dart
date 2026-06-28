@@ -20,6 +20,11 @@ class AnalyzingController extends GetxController {
   final _isProcessing = false.obs;
   final recentHistory = <HistoryItem>[].obs;
 
+  // 이 화면(컨트롤러)이 dispose 되었는지 여부.
+  // 분석 중 사용자가 뒤로가기로 나가면 onClose()에서 true가 되고,
+  // 그 뒤 백그라운드 분석이 끝나도 다이얼로그/화면이동을 막는다.
+  bool _isClosed = false;
+
   bool get isProcessing => _isProcessing.value;
 
   final List<String> stepMessages = [
@@ -55,6 +60,7 @@ class AnalyzingController extends GetxController {
 
   @override
   void onClose() {
+    _isClosed = true; // 화면이 사라졌음을 표시 → 이후 다이얼로그/이동 차단
     _apiProvider.dispose();
     super.onClose();
   }
@@ -78,6 +84,74 @@ class AnalyzingController extends GetxController {
   }
 
   void goToHistory() => Get.toNamed(Routes.history);
+
+  /// 최근 기록 아이템을 누르면 그 분석 결과 화면으로 이동.
+  /// (history_controller.onHistoryItemPressed 와 동일한 동작)
+  void onRecentHistoryItemPressed(HistoryItem item) {
+    Get.toNamed(Routes.result, arguments: {
+      'result': RiskAnalysisResponse(
+        score: item.score,
+        level: item.level,
+        issues: item.issues,
+        actionGuide: item.actionGuide,
+        publicData: item.publicData,
+        mappingTablePurged: true,
+      ),
+      'address': item.address,
+      'fromHistory': true,
+    });
+  }
+
+  /// 분석 중 뒤로가기를 눌렀을 때 호출 (PopScope 에서 사용).
+  /// "나가면 분석이 중단됩니다" 확인 다이얼로그를 띄운다.
+  Future<void> onWillPop() async {
+    // 분석 중이 아니면 그냥 뒤로가기 허용
+    if (!_isProcessing.value) {
+      Get.back();
+      return;
+    }
+
+    Get.dialog(
+      AlertDialog(
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text(
+          '분석을 중단할까요?',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+        ),
+        content: const Text(
+          '나가면 계약서 분석이 중단됩니다.',
+          style: TextStyle(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(), // 다이얼로그만 닫기 → 화면 유지
+            child: const Text('취소'),
+          ),
+          TextButton(
+            onPressed: () {
+              Get.back(); // 다이얼로그 닫기
+              _cancelAnalysis(); // 분석 중단 표시
+              Get.back(); // 분석 화면 나가기
+            },
+            child: const Text(
+              '나가기',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+          ),
+        ],
+      ),
+      barrierDismissible: false,
+    );
+  }
+
+  /// 진행 중인 분석을 "중단"으로 표시.
+  /// http 요청 자체를 즉시 취소할 수는 없지만,
+  /// _isClosed=true 로 두면 결과가 와도 다이얼로그/이동이 일어나지 않는다.
+  void _cancelAnalysis() {
+    _isClosed = true;
+    _isProcessing.value = false;
+  }
 
   Future<void> _runAnalysis(String imagePath) async {
     if (_isProcessing.value) return;
@@ -106,14 +180,17 @@ class AnalyzingController extends GetxController {
       currentStep.value = 2;
       final riskResult = await _apiProvider.analyzeRisk(imageResult.sessionId);
 
+      // 화면이 이미 사라졌으면 결과 화면으로 이동하지 않는다.
+      if (_isClosed) return;
+
       Get.offNamed(Routes.result, arguments: {
         'result': riskResult,
         'address': addressResult?.roadAddress ?? imageResult.address ?? '',
       });
     } on ApiException catch (e) {
-      ErrorDialog.show(
+      _showErrorIfAlive(
         errorCode: e.errorCode,
-        onRetry: () => _runAnalysis(imagePath),
+        imagePath: imagePath,
       );
     } on SocketException catch (e) {
       final msg = e.message.toLowerCase();
@@ -121,22 +198,35 @@ class AnalyzingController extends GetxController {
           msg.contains('failed host lookup') ||
           msg.contains('no address associated') ||
           msg.contains('no route to host');
-      ErrorDialog.show(
+      _showErrorIfAlive(
         errorCode: isNoInternet ? 'NETWORK_ERROR' : 'SERVER_ERROR',
-        onRetry: () => _runAnalysis(imagePath),
+        imagePath: imagePath,
       );
     } on TimeoutException {
-      ErrorDialog.show(
+      _showErrorIfAlive(
         errorCode: 'TIMEOUT_ERROR',
-        onRetry: () => _runAnalysis(imagePath),
+        imagePath: imagePath,
       );
     } catch (_) {
-      ErrorDialog.show(
+      _showErrorIfAlive(
         errorCode: 'SERVER_ERROR',
-        onRetry: () => _runAnalysis(imagePath),
+        imagePath: imagePath,
       );
     } finally {
       _isProcessing.value = false;
     }
+  }
+
+  /// 분석 화면이 아직 살아있을 때만 에러 다이얼로그를 띄운다.
+  /// 사용자가 이미 나갔으면(_isClosed) 전역 다이얼로그가 뜨지 않도록 막는다.
+  void _showErrorIfAlive({
+    required String errorCode,
+    required String imagePath,
+  }) {
+    if (_isClosed) return;
+    ErrorDialog.show(
+      errorCode: errorCode,
+      onRetry: () => _runAnalysis(imagePath),
+    );
   }
 }

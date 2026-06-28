@@ -9,28 +9,41 @@ class AnalyzingView extends GetView<AnalyzingController> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF9F9F9),
-      appBar: AppBar(
-        title: const Text(
-          '계약서 분석',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-        ),
-        actions: [
-          IconButton(
-            onPressed: () => Get.offAllNamed(Routes.home),
-            icon: const Icon(Icons.home, color: Colors.black),
+    // 분석 중 뒤로가기를 가로채기 위해 PopScope 로 감싼다.
+    // canPop: false 로 두고, 실제 처리는 controller.onWillPop 에서 한다.
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return; // 이미 pop 되었으면 중복 처리 방지
+        controller.onWillPop();
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F9F9),
+        appBar: AppBar(
+          title: const Text(
+            '계약서 분석',
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
           ),
-        ],
-        backgroundColor: Colors.white,
-        elevation: 0,
-        automaticallyImplyLeading: true,
+          // 기본 뒤로가기 버튼도 PopScope 를 거치도록 직접 연결
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () => controller.onWillPop(),
+          ),
+          actions: [
+            IconButton(
+              onPressed: () => Get.offAllNamed(Routes.home),
+              icon: const Icon(Icons.home, color: Colors.black),
+            ),
+          ],
+          backgroundColor: Colors.white,
+          elevation: 0,
+        ),
+        // isProcessing 전환만 추적하는 외부 Obx
+        body: Obx(() {
+          if (controller.isProcessing) return _buildProcessingBody();
+          return _buildIdleBody();
+        }),
       ),
-      // isProcessing 전환만 추적하는 외부 Obx
-      body: Obx(() {
-        if (controller.isProcessing) return _buildProcessingBody();
-        return _buildIdleBody();
-      }),
     );
   }
 
@@ -162,37 +175,45 @@ class AnalyzingView extends GetView<AnalyzingController> {
   }
 
   Widget _buildHistoryItem(HistoryItem item) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        Icon(
-          controller.recentHistoryItemIcon(item),
-          color: Colors.black87,
-          size: 20,
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: Text(
-            item.address,
-            style: const TextStyle(fontSize: 14, height: 1.4),
-          ),
-        ),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: controller.recentHistoryItemColor(item),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Text(
-            controller.recentHistoryItemBadge(item),
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
+    // 아이템 전체를 눌러도 결과 화면으로 이동 (더보기 외에 아이템 클릭도 지원)
+    return InkWell(
+      onTap: () => controller.onRecentHistoryItemPressed(item),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Icon(
+              controller.recentHistoryItemIcon(item),
+              color: Colors.black87,
+              size: 20,
             ),
-          ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                item.address,
+                style: const TextStyle(fontSize: 14, height: 1.4),
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: controller.recentHistoryItemColor(item),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                controller.recentHistoryItemBadge(item),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 

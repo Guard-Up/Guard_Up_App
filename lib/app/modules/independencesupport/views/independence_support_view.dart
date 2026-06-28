@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
 import '../../../data/models/institution_response.dart';
+import '../../../widgets/app_bottom_nav.dart';
 import '../controllers/independence_support_controller.dart';
 
 class IndependenceSupportView extends GetView<IndependenceSupportController> {
@@ -50,7 +51,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
         ),
       ),
       // ── 하단 네비게이션: 기록 / 촬영 / 사용자 ──
-      bottomNavigationBar: _BottomNav(controller: controller),
+      bottomNavigationBar: const AppBottomNav(current: AppNavTab.consult),
     );
   }
 
@@ -124,6 +125,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
   Widget _buildSearchRow() {
     return Row(
       children: [
+        // 지역 선택 (MenuAnchor: 목록이 칸 바로 아래에 좁게 떨어짐 → 화면 안 가림)
         MenuAnchor(
           style: MenuStyle(
             backgroundColor: WidgetStateProperty.all(AppColors.white),
@@ -194,7 +196,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
           },
         ),
         const Spacer(),
-        // 조회 버튼
+        // 조회 버튼 
         OutlinedButton(
           onPressed: controller.onSearch,
           style: OutlinedButton.styleFrom(
@@ -223,7 +225,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 로딩 박스 ─────────────────────
+  // ── 로딩 박스  ─────────────────────
   Widget _loadingBox() {
     return Center(
       child: Container(
@@ -343,7 +345,7 @@ class IndependenceSupportView extends GetView<IndependenceSupportController> {
     );
   }
 
-  // ── 전문 상담 기관 카드  ─────────────────────
+  // ── 전문 상담 기관 카드 (고정 내용) ─────────────────────
   Widget _buildProOrgCard() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -442,48 +444,3 @@ const List<ProOrg> kProOrgs = [
   ProOrg(name: '대한변호사협회 법률구조재단', phone: '02-3476-6515'),
   ProOrg(name: '법률홈닥터', phone: '132', note: '(주거 관련 무료 법률 상담)'),
 ];
-
-// ── 하단 네비게이션 바 ────────────────────────────────────
-class _BottomNav extends StatelessWidget {
-  final IndependenceSupportController controller;
-  const _BottomNav({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.borderLine)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.segment,
-                    size: 28, color: AppColors.textBlack),
-                tooltip: '최근 기록',
-                onPressed: controller.onHistoryPressed,
-              ),
-              IconButton(
-                icon: const Icon(Icons.photo_camera_outlined,
-                    size: 30, color: AppColors.textBlack),
-                tooltip: '계약서 촬영',
-                onPressed: controller.onScanPressed,
-              ),
-              IconButton(
-                icon: const Icon(Icons.person_outline,
-                    size: 28, color: AppColors.primaryBlue),
-                tooltip: '사용자',
-                onPressed: controller.onUserPressed,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
