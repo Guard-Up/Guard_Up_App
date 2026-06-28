@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../constants/app_constants.dart';
-import '../controllers/help_support_controller.dart';
 import 'package:get/get.dart';
+import '../../../constants/app_constants.dart';
+import '../../../widgets/app_bottom_nav.dart';
+import '../controllers/help_support_controller.dart';
 
 class HelpSupportView extends GetView<HelpSupportController> {
   const HelpSupportView({super.key});
@@ -10,7 +11,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.white,
-      // ── 상단바 ──
+      // ── 상단바: 방패 + 앱 이름 + 홈 버튼 (자립상담과 동일) ──
       appBar: AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -70,7 +71,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
         ),
       ),
       // ── 하단 네비게이션 (자립상담과 동일) ──
-      bottomNavigationBar: _BottomNav(controller: controller),
+      bottomNavigationBar: const AppBottomNav(current: AppNavTab.consult),
     );
   }
 
@@ -137,7 +138,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
     );
   }
 
-  // ── 국토부 연결 링크  ──────────────
+  // ── 국토부 연결 링크 (탭하면 웹페이지 열림) ──────────────
   Widget _buildMolitLink() {
     return InkWell(
       onTap: controller.openMolitWebsite,
@@ -285,49 +286,7 @@ class HelpSupportView extends GetView<HelpSupportController> {
   }
 }
 
-// ── 하단 네비게이션 바 ──────────────────
-class _BottomNav extends StatelessWidget {
-  final HelpSupportController controller;
-  const _BottomNav({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.borderLine)),
-      ),
-      child: SafeArea(
-        top: false,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.segment, size: 28, color: AppColors.textBlack),
-                tooltip: '최근 기록',
-                onPressed: controller.onHistoryPressed,
-              ),
-              IconButton(
-                icon: const Icon(Icons.photo_camera_outlined, size: 30, color: AppColors.textBlack),
-                tooltip: '계약서 촬영',
-                onPressed: controller.onScanPressed,
-              ),
-              IconButton(
-                icon: const Icon(Icons.person_outline, size: 28, color: AppColors.primaryBlue),
-                tooltip: '사용자',
-                onPressed: controller.onUserPressed,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// 피해 상담 기관
+/// 피해 상담 기관 (고정 데이터용 모델)
 class Agency {
   final String name; // 기관명
   final String phone; // 전화번호
@@ -335,7 +294,7 @@ class Agency {
   const Agency({required this.name, required this.phone});
 }
 
-/// 피해 상담 기관 고정 목록
+/// 피해 상담 기관 고정 목록 (재사용 상수)
 const List<Agency> kHelpAgencies = [
   Agency(name: '경찰청', phone: '112'),
   Agency(name: 'LH콜센터', phone: '1600-1004'),

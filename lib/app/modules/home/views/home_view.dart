@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
 import '../../../routes/app_routes.dart';
+import '../../../widgets/app_bottom_nav.dart';
 import '../controllers/home_controller.dart';
 
 class HomeView extends GetView<HomeController> {
@@ -94,7 +95,8 @@ class HomeView extends GetView<HomeController> {
           ],
         ),
       ),
-      bottomNavigationBar: const _BottomNav(),
+      // 공통 하단바 사용 (모든 화면 위치/SafeArea 통일)
+      bottomNavigationBar: const AppBottomNav(current: AppNavTab.analyze),
     );
   }
 }
@@ -212,81 +214,6 @@ class _MenuCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _BottomNav extends StatelessWidget {
-  const _BottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.white,
-        border: Border(top: BorderSide(color: AppColors.borderLine)),
-      ),
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavItem(
-            icon: Icons.menu_rounded,
-            label: '기록',
-            isActive: false,
-            onTap: () => Get.toNamed(Routes.history),
-          ),
-          _NavItem(
-            icon: Icons.camera_alt_outlined,
-            label: '분석',
-            isActive: true,
-            onTap: () => Get.toNamed(Routes.analyzing),
-          ),
-          _NavItem(
-            icon: Icons.person_outline,
-            label: '상담',
-            isActive: false,
-            onTap: () => Get.toNamed(Routes.helpSupport),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isActive ? AppColors.primaryBlue : AppColors.textDisable;
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: color, size: 26),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              fontSize: 11,
-              color: color,
-              fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-            ),
-          ),
-        ],
       ),
     );
   }
