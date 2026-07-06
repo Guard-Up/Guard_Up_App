@@ -1,25 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'app/constants/app_constants.dart';
 import 'app/routes/app_pages.dart';
 import 'app/services/local_storage_service.dart';
+import 'app/utils/system_ui_helper.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.manual,
-    overlays: [SystemUiOverlay.top],
-  );
-  SystemChrome.setSystemUIChangeCallback((systemOverlaysAreVisible) async {
-    if (systemOverlaysAreVisible) {
-      await Future.delayed(const Duration(seconds: 2));
-      SystemChrome.setEnabledSystemUIMode(
-        SystemUiMode.manual,
-        overlays: [SystemUiOverlay.top],
-      );
-    }
-  });
+  SystemUiHelper.hideBottomNavBar(); // 하단 시스템바 숨김 (전역 적용)
   Get.put(LocalStorageService(), permanent: true);
   await Get.find<LocalStorageService>().init();
   runApp(const GuardUpApp());
