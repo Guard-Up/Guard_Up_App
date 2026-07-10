@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../data/models/history_item.dart';
@@ -67,59 +68,154 @@ class AnalyzingView extends GetView<AnalyzingController> {
   Widget _buildUploadSection() {
     return Padding(
       padding: const EdgeInsets.all(20.0),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 48),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF0F0F0),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // 선택된 이미지가 있으면 썸네일, 없으면 안내 박스
+          Obx(() => controller.hasImages
+              ? _buildThumbnailStrip()
+              : _buildEmptyHint()),
+          const SizedBox(height: 16),
+          // 촬영 / 앨범 추가 버튼
+          Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: controller.addFromCamera,
+                  icon: const Icon(Icons.camera_alt_outlined, size: 18),
+                  label: const Text('촬영'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.black87,
+                    side: const BorderSide(color: Color(0xFFDDDDDD)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  onPressed: controller.addFromGallery,
+                  icon: const Icon(Icons.photo_library_outlined, size: 18),
+                  label: const Text('앨범'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.black87,
+                    side: const BorderSide(color: Color(0xFFDDDDDD)),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          // 분석하기 버튼 (이미지 있을 때만 활성)
+          Obx(() => ElevatedButton(
+                onPressed:
+                    controller.hasImages ? controller.startAnalysis : null,
+                child: Text(controller.analyzeButtonText),
+              )),
+        ],
+      ),
+    );
+  }
+
+  // 이미지 미선택 안내 박스
+  Widget _buildEmptyHint() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(vertical: 40),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF0F0F0),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.description_outlined, size: 48, color: Colors.black45),
+          SizedBox(height: 12),
+          Text(
+            '계약서를 촬영하거나 앨범에서 선택하세요\n여러 장(페이지)도 함께 분석돼요',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.black87,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // 선택된 이미지 썸네일 가로 스트립 (각 삭제 가능)
+  Widget _buildThumbnailStrip() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              '계약서를 사진 찍거나\n파일에서 업로드 해주세요',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.w500,
-                color: Colors.black87,
-              ),
+              '선택된 계약서',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 24),
-            InkWell(
-              onTap: controller.openCamera,
-              child: const Icon(
-                Icons.camera_alt,
-                size: 56,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: controller.uploadFile,
-              icon: const Icon(Icons.upload, size: 18),
-              label: const Text(
-                '파일 업로드',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF8B8CFF),
-                foregroundColor: Colors.white,
-                elevation: 0,
-                minimumSize: Size.zero,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 12,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-              ),
+            Text(
+              controller.selectedCountText,
+              style: const TextStyle(fontSize: 13, color: Colors.black54),
             ),
           ],
         ),
-      ),
+        const SizedBox(height: 10),
+        SizedBox(
+          height: 96,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: controller.selectedImages.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (_, index) => _buildThumbnail(
+              controller.selectedImages[index],
+              index,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildThumbnail(String path, int index) {
+    return Stack(
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.file(
+            File(path),
+            width: 74,
+            height: 96,
+            fit: BoxFit.cover,
+          ),
+        ),
+        Positioned(
+          top: 4,
+          right: 4,
+          child: GestureDetector(
+            onTap: () => controller.removeImage(index),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.black54,
+                shape: BoxShape.circle,
+              ),
+              padding: const EdgeInsets.all(2),
+              child: const Icon(Icons.close, size: 14, color: Colors.white),
+            ),
+          ),
+        ),
+      ],
     );
   }
 

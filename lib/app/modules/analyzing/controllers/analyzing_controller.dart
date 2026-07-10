@@ -16,9 +16,15 @@ class AnalyzingController extends GetxController {
   final _picker = ImagePicker();
   final _storageService = Get.find<LocalStorageService>();
 
+  /// 계약서 한 건에 담을 수 있는 최대 이미지(페이지) 수.
+  static const int maxImages = 10;
+
   final currentStep = 0.obs;
   final _isProcessing = false.obs;
   final recentHistory = <HistoryItem>[].obs;
+
+  /// 분석 대기 중 선택된 이미지 경로들 (촬영·앨범으로 추가, 최대 [maxImages]장).
+  final selectedImages = <String>[].obs;
 
   // 이 화면(컨트롤러)이 dispose 되었는지 여부.
   // 분석 중 사용자가 뒤로가기로 나가면 onClose()에서 true가 되고,
@@ -53,8 +59,8 @@ class AnalyzingController extends GetxController {
     super.onInit();
     _loadRecentHistory();
     final args = Get.arguments;
-    if (args is Map && args['imagePath'] != null) {
-      _runAnalysis(args['imagePath'] as String);
+    if (args is Map && args['imagePath'] is String) {
+      _addImage(args['imagePath'] as String);
     }
   }
 
@@ -72,15 +78,75 @@ class AnalyzingController extends GetxController {
     } catch (_) {}
   }
 
-  Future<void> openCamera() async {
+  // ── 이미지 선택 (촬영/앨범) ─────────────────────────────
+  bool get canAddMore => selectedImages.length < maxImages;
+  bool get hasImages => selectedImages.isNotEmpty;
+  String get selectedCountText => '${selectedImages.length}/$maxImages';
+  String get analyzeButtonText =>
+      hasImages ? '분석하기 (${selectedImages.length}장)' : '분석하기';
+
+  /// 카메라로 촬영해 한 장 추가.
+  Future<void> addFromCamera() async {
+    if (!_ensureCanAdd()) return;
     final result = await Get.toNamed(Routes.scan);
-    if (result is String) _runAnalysis(result);
+    if (result is String) _addImage(result);
   }
 
-  Future<void> uploadFile() async {
-    final file = await _picker.pickImage(source: ImageSource.gallery);
-    if (file == null) return;
-    _runAnalysis(file.path);
+  /// 앨범에서 여러 장 선택해 추가 (imageQuality: JPEG 재인코딩 + 압축).
+  Future<void> addFromGallery() async {
+    if (!_ensureCanAdd()) return;
+    final files = await _picker.pickMultiImage(imageQuality: 90);
+    for (final f in files) {
+      if (!canAddMore) {
+        _showMaxReached();
+        break;
+      }
+      _addImage(f.path);
+    }
+  }
+
+  void removeImage(int index) {
+    if (index >= 0 && index < selectedImages.length) {
+      selectedImages.removeAt(index);
+    }
+  }
+
+  void _addImage(String path) {
+    if (!canAddMore) {
+      _showMaxReached();
+      return;
+    }
+    selectedImages.add(path);
+  }
+
+  bool _ensureCanAdd() {
+    if (canAddMore) return true;
+    _showMaxReached();
+    return false;
+  }
+
+  void _showMaxReached() {
+    Get.snackbar(
+      '안내',
+      '최대 $maxImages장까지 추가할 수 있어요.',
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+    );
+  }
+
+  /// "분석하기" 버튼 → 선택된 이미지들로 분석 시작.
+  void startAnalysis() {
+    if (_isProcessing.value) return;
+    if (selectedImages.isEmpty) {
+      Get.snackbar(
+        '안내',
+        '먼저 계약서 이미지를 추가해주세요.',
+        snackPosition: SnackPosition.BOTTOM,
+        margin: const EdgeInsets.all(16),
+      );
+      return;
+    }
+    _runAnalysis(selectedImages.toList());
   }
 
   void goToHistory() => Get.toNamed(Routes.history);
@@ -153,13 +219,13 @@ class AnalyzingController extends GetxController {
     _isProcessing.value = false;
   }
 
-  Future<void> _runAnalysis(String imagePath) async {
+  Future<void> _runAnalysis(List<String> imagePaths) async {
     if (_isProcessing.value) return;
     _isProcessing.value = true;
     currentStep.value = 0;
 
     try {
-      final imageResult = await _apiProvider.analyzeImage(imagePath);
+      final imageResult = await _apiProvider.analyzeImage(imagePaths);
 
       currentStep.value = 1;
       VerifyAddressResponse? addressResult;
@@ -190,7 +256,7 @@ class AnalyzingController extends GetxController {
     } on ApiException catch (e) {
       _showErrorIfAlive(
         errorCode: e.errorCode,
-        imagePath: imagePath,
+        imagePaths: imagePaths,
       );
     } on SocketException catch (e) {
       final msg = e.message.toLowerCase();
@@ -200,17 +266,17 @@ class AnalyzingController extends GetxController {
           msg.contains('no route to host');
       _showErrorIfAlive(
         errorCode: isNoInternet ? 'NETWORK_ERROR' : 'SERVER_ERROR',
-        imagePath: imagePath,
+        imagePaths: imagePaths,
       );
     } on TimeoutException {
       _showErrorIfAlive(
         errorCode: 'TIMEOUT_ERROR',
-        imagePath: imagePath,
+        imagePaths: imagePaths,
       );
     } catch (_) {
       _showErrorIfAlive(
         errorCode: 'SERVER_ERROR',
-        imagePath: imagePath,
+        imagePaths: imagePaths,
       );
     } finally {
       _isProcessing.value = false;
@@ -221,12 +287,12 @@ class AnalyzingController extends GetxController {
   /// 사용자가 이미 나갔으면(_isClosed) 전역 다이얼로그가 뜨지 않도록 막는다.
   void _showErrorIfAlive({
     required String errorCode,
-    required String imagePath,
+    required List<String> imagePaths,
   }) {
     if (_isClosed) return;
     ErrorDialog.show(
       errorCode: errorCode,
-      onRetry: () => _runAnalysis(imagePath),
+      onRetry: () => _runAnalysis(imagePaths),
     );
   }
 }
