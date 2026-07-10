@@ -31,6 +31,9 @@ class ErrorDialog {
     'SERVER_ERROR': '일시적인 오류가 발생했어요.\n잠시 후 다시 시도해주세요.',
     'NETWORK_ERROR': '인터넷 연결을 확인해주세요.',
     'TIMEOUT_ERROR': '응답이 늦어지고 있어요.\n잠시 후 다시 시도해주세요.',
+    'MULTIPLE_CONTRACTS': '서로 다른 계약서가 여러 건 감지됐어요.\n한 건의 계약서만 올려주세요.',
+    'NOT_JEONSE': '전세 계약서가 아니에요.\n전세 계약서만 분석할 수 있어요.',
+    'NOT_CONTRACT': '계약서를 인식하지 못했어요.\n전세 계약서 사진인지 확인해주세요.',
   };
 
   static void show({
