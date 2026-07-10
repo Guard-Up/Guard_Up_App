@@ -1,7 +1,6 @@
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import '../data/models/history_item.dart';
-import '../data/models/risk_analysis_response.dart';
 
 class LocalStorageService {
   static const String _tableName = 'history';
@@ -35,15 +34,17 @@ class LocalStorageService {
   }
 
   Future<void> saveHistory(HistoryItem item) async {
-    // 독소 조항(issues)이 완전히 같은 기존 기록이 있으면 중복으로 간주.
-    // 새로 쌓지 않고, 기존 항목의 시각만 최신으로 갱신해 목록 맨 위로 올린다.
+    // 같은 주소(=같은 계약서)의 기존 기록이 있으면 중복으로 간주.
+    // 실제 분석은 같은 계약서여도 AI가 조항을 매번 미세하게 다르게 주므로,
+    // 조항 비교 대신 주소로 판단한다.
+    // 중복이면 최신 결과로 덮어쓰고 시각을 갱신해 목록 맨 위로 올린다.
     final existing = await getHistory();
-    final duplicate = _findBySameIssues(existing, item.issues);
+    final duplicate = _findBySameAddress(existing, item.address);
 
     if (duplicate?.id != null) {
       await _db!.update(
         _tableName,
-        {'created_at': item.createdAt.toIso8601String()},
+        item.toMap()..remove('id'),
         where: 'id = ?',
         whereArgs: [duplicate!.id],
       );
@@ -54,22 +55,15 @@ class LocalStorageService {
     await _trimToLimit();
   }
 
-  /// 독소 조항 목록이 완전히 동일한 기록을 찾는다. (순서 무관)
-  HistoryItem? _findBySameIssues(List<HistoryItem> list, List<Issue> issues) {
-    final target = _issueSignature(issues);
+  /// 주소가 같은(비어 있지 않은) 기존 기록을 찾는다. 같은 계약서로 간주.
+  /// 주소가 비어 있으면 비교 불가하므로 항상 새 기록으로 추가한다.
+  HistoryItem? _findBySameAddress(List<HistoryItem> list, String address) {
+    final target = address.trim();
+    if (target.isEmpty) return null;
     for (final item in list) {
-      if (_issueSignature(item.issues) == target) return item;
+      if (item.address.trim() == target) return item;
     }
     return null;
-  }
-
-  /// 조항 목록을 비교용 문자열로 변환 (내용 기준, 순서 영향 없도록 정렬).
-  String _issueSignature(List<Issue> issues) {
-    final keys = issues
-        .map((i) => '${i.clause}|${i.reason}|${i.severity}|${i.isLegalBasis}')
-        .toList()
-      ..sort();
-    return keys.join('##');
   }
 
   /// 보관 개수를 초과하면 오래된 기록부터 삭제한다.
