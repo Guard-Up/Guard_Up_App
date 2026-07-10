@@ -55,13 +55,16 @@ class ApiProvider {
         jsonDecode(response.body) as Map<String, dynamic>);
   }
 
-  // 1단계: 계약서 이미지 분석
-  Future<AnalyzeImageResponse> analyzeImage(String imagePath) async {
+  // 1단계: 계약서 이미지 분석 (1장·여러 장 모두 지원)
+  // 여러 장이면 같은 필드명 'file'을 반복해서 담는다. (백엔드 스펙)
+  Future<AnalyzeImageResponse> analyzeImage(List<String> imagePaths) async {
     final request = http.MultipartRequest(
       'POST',
       Uri.parse('${ApiConstants.baseUrl}${ApiConstants.analyzeImage}'),
     );
-    request.files.add(await http.MultipartFile.fromPath('file', imagePath));
+    for (final path in imagePaths) {
+      request.files.add(await http.MultipartFile.fromPath('file', path));
+    }
 
     final streamed = await request.send().timeout(ApiConstants.requestTimeout);
     final response = await http.Response.fromStream(streamed);
