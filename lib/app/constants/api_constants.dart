@@ -1,7 +1,7 @@
 class ApiConstants {
   ApiConstants._();
 
-  static const String baseUrl = 'http://localhost:8000/api';
+  static const String baseUrl = 'http://35.154.136.12/api';
   static const Duration requestTimeout = Duration(seconds: 60);
 
   // Endpoints
