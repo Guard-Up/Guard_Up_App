@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -254,11 +255,15 @@ class AnalyzingController extends GetxController {
         'address': addressResult?.roadAddress ?? imageResult.address ?? '',
       });
     } on ApiException catch (e) {
+      log('분석 실패 (step=${currentStep.value}) $e',
+          name: 'AnalyzingController');
       _showErrorIfAlive(
         errorCode: e.errorCode,
         imagePaths: imagePaths,
       );
     } on SocketException catch (e) {
+      log('분석 실패 (step=${currentStep.value}) 소켓: ${e.message}',
+          name: 'AnalyzingController');
       final msg = e.message.toLowerCase();
       final isNoInternet = msg.contains('network is unreachable') ||
           msg.contains('failed host lookup') ||
@@ -273,7 +278,9 @@ class AnalyzingController extends GetxController {
         errorCode: 'TIMEOUT_ERROR',
         imagePaths: imagePaths,
       );
-    } catch (_) {
+    } catch (e, st) {
+      log('분석 실패 (step=${currentStep.value}) 예상 못 한 예외',
+          name: 'AnalyzingController', error: e, stackTrace: st);
       _showErrorIfAlive(
         errorCode: 'SERVER_ERROR',
         imagePaths: imagePaths,
