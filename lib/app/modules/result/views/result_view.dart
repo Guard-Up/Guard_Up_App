@@ -286,6 +286,10 @@ class _ResultBody extends StatelessWidget {
           _LegalGuideCard(controller: controller),
           const SizedBox(height: 16),
           _GeneralGuideCard(controller: controller),
+          if (controller.hasActionGuides) ...[
+            const SizedBox(height: 28),
+            _ActionGuideSection(controller: controller),
+          ],
           const SizedBox(height: 8),
         ],
       ),
@@ -660,6 +664,239 @@ class _GeneralGuideCard extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+}
+
+// ── 행동 가이드 섹션 ──────────────────────────────────────────
+class _ActionGuideSection extends StatelessWidget {
+  final ResultController controller;
+
+  const _ActionGuideSection({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          controller.actionGuideTitleText,
+          style: const TextStyle(
+            color: AppColors.textBlack,
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          controller.actionGuideSubtitleText,
+          style: const TextStyle(
+            color: AppColors.textSub,
+            fontSize: 13,
+            height: 1.4,
+          ),
+        ),
+        const SizedBox(height: 16),
+        for (final guide in controller.actionGuides)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _ActionGuideCard(guide: guide, controller: controller),
+          ),
+      ],
+    );
+  }
+}
+
+// ── 행동 가이드 카드 (type별 분기) ────────────────────────────
+class _ActionGuideCard extends StatelessWidget {
+  final ActionGuide guide;
+  final ResultController controller;
+
+  const _ActionGuideCard({required this.guide, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final type = guide.typeEnum;
+    final accent = type.color;
+
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: AppColors.borderLine),
+      ),
+      // 스크롤 영역 안이라 높이가 무한대 → IntrinsicHeight로 내용 높이에 맞춰 stretch
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // 좌측 유형 색상 강조 바
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: accent,
+                borderRadius: const BorderRadius.horizontal(
+                  left: Radius.circular(14),
+                ),
+              ),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: accent.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(type.icon, color: accent, size: 20),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: type == ActionGuideType.institution
+                          ? _InstitutionBody(
+                              guide: guide,
+                              accent: accent,
+                              controller: controller,
+                            )
+                          : _MessageBody(
+                              label: type.label,
+                              message: guide.message,
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ── 메시지형 카드 본문 (stop / warning / legal) ───────────────
+class _MessageBody extends StatelessWidget {
+  final String label;
+  final String? message;
+
+  const _MessageBody({required this.label, required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            color: AppColors.textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (message != null && message!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            message!,
+            style: const TextStyle(
+              color: AppColors.textSub,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+// ── 기관 연결 카드 본문 (institution) ─────────────────────────
+class _InstitutionBody extends StatelessWidget {
+  final ActionGuide guide;
+  final Color accent;
+  final ResultController controller;
+
+  const _InstitutionBody({
+    required this.guide,
+    required this.accent,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          guide.typeEnum.label,
+          style: const TextStyle(
+            color: AppColors.textBlack,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        if (guide.region != null && guide.region!.isNotEmpty) ...[
+          const SizedBox(height: 4),
+          Text(
+            guide.region!,
+            style: const TextStyle(
+              color: AppColors.textSub,
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+        ],
+        if (guide.name != null && guide.name!.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(
+            guide.name!,
+            style: const TextStyle(
+              color: AppColors.textBlack,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              height: 1.4,
+            ),
+          ),
+        ],
+        if (guide.address != null && guide.address!.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(
+            guide.address!,
+            style: const TextStyle(
+              color: AppColors.textSub,
+              fontSize: 12,
+              height: 1.4,
+            ),
+          ),
+        ],
+        if (guide.phone != null && guide.phone!.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: () => controller.onCallPressed(guide.phone!),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.call_rounded, color: accent, size: 16),
+                const SizedBox(width: 6),
+                Text(
+                  guide.phone!,
+                  style: TextStyle(
+                    color: accent,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

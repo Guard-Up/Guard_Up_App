@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../data/models/history_item.dart';
 import '../../../data/models/risk_analysis_response.dart';
 import '../../../routes/app_routes.dart';
@@ -112,6 +113,37 @@ class ResultController extends GetxController {
 
   String get generalGuideBodyText =>
       '법적 강제 사항은 아니나, 계약 전 충분히 검토하고 본인이 판단하세요.';
+
+  // ─── 행동 가이드 (actionGuide) ───────────────────────────
+  List<ActionGuide> get actionGuides => result.actionGuide;
+
+  bool get hasActionGuides => actionGuides.isNotEmpty;
+
+  String get actionGuideTitleText => '이렇게 하세요';
+
+  String get actionGuideSubtitleText => '분석 결과에 맞춘 다음 행동을 안내합니다.';
+
+  /// 기관 연결 카드의 전화번호 탭 시 전화 앱 열기
+  Future<void> onCallPressed(String phone) async {
+    final digits = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+    final uri = Uri.parse('tel:$digits');
+    try {
+      final ok = await launchUrl(uri);
+      if (!ok) _showCallError();
+    } catch (e, st) {
+      log('전화 연결 실패', name: 'ResultController', error: e, stackTrace: st);
+      _showCallError();
+    }
+  }
+
+  void _showCallError() {
+    Get.snackbar(
+      '안내',
+      '전화 앱을 열 수 없어요.',
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+    );
+  }
 
   // ─── 네비게이션 ──────────────────────────────────────────
   void onBackPressed() => Get.offAllNamed(Routes.home);

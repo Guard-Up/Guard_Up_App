@@ -81,8 +81,74 @@ class Issue {
       };
 }
 
+/// 행동 가이드 유형 (백엔드 action_guide[].type)
+/// stop: 즉시 중단 / warning: 주의 / legal: 법률 안내 / institution: 기관 연결
+enum ActionGuideType { stop, warning, legal, institution, unknown }
+
+extension ActionGuideTypeExt on ActionGuideType {
+  static ActionGuideType fromString(String value) {
+    switch (value) {
+      case 'stop':
+        return ActionGuideType.stop;
+      case 'warning':
+        return ActionGuideType.warning;
+      case 'legal':
+        return ActionGuideType.legal;
+      case 'institution':
+        return ActionGuideType.institution;
+      default:
+        return ActionGuideType.unknown;
+    }
+  }
+
+  String get label {
+    switch (this) {
+      case ActionGuideType.stop:
+        return '즉시 중단';
+      case ActionGuideType.warning:
+        return '주의 사항';
+      case ActionGuideType.legal:
+        return '법률 안내';
+      case ActionGuideType.institution:
+        return '전문 기관 연결';
+      case ActionGuideType.unknown:
+        return '안내';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case ActionGuideType.stop:
+        return AppColors.danger;
+      case ActionGuideType.warning:
+        return AppColors.caution;
+      case ActionGuideType.legal:
+        return AppColors.primaryBlue;
+      case ActionGuideType.institution:
+        return AppColors.primaryBlue;
+      case ActionGuideType.unknown:
+        return AppColors.textSub;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case ActionGuideType.stop:
+        return Icons.do_not_disturb_on_rounded;
+      case ActionGuideType.warning:
+        return Icons.warning_amber_rounded;
+      case ActionGuideType.legal:
+        return Icons.balance_rounded;
+      case ActionGuideType.institution:
+        return Icons.apartment_rounded;
+      case ActionGuideType.unknown:
+        return Icons.info_outline_rounded;
+    }
+  }
+}
+
 class ActionGuide {
-  final String type; // stop, institution, legal
+  final String type; // stop, warning, legal, institution
   final String? message;
   final String? name;
   final String? phone;
@@ -99,6 +165,9 @@ class ActionGuide {
     this.address,
     this.link,
   });
+
+  /// 백엔드 문자열 type을 enum으로 변환 (API 응답 가공)
+  ActionGuideType get typeEnum => ActionGuideTypeExt.fromString(type);
 
   factory ActionGuide.fromJson(Map<String, dynamic> json) {
     return ActionGuide(
