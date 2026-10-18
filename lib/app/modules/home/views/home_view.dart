@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
-import '../../../routes/app_routes.dart';
 import '../../../widgets/app_bottom_nav.dart';
 import '../controllers/home_controller.dart';
 
