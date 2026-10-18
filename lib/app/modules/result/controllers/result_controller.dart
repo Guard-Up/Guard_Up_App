@@ -24,28 +24,37 @@ class ResultController extends GetxController {
   void onInit() {
     super.onInit();
     final args = Get.arguments;
-    if (args is Map) {
-      final rawResult = args['result'];
-      final rawAddress = args['address'];
-      if (rawResult is RiskAnalysisResponse) {
-        _result = rawResult;
-        _address = rawAddress is String ? rawAddress : '';
-        final isFromHistory = args['fromHistory'] == true;
-        if (isFromHistory) {
-          displayState.value = ResultDisplayState.ready;
-        } else {
-          _saveToHistory();
-        }
-      } else {
-        _result = _mockResult;
-        _address = '';
-        _saveToHistory();
-      }
+    if (args is! Map) return;
+    final rawResult = args['result'];
+    if (rawResult is! RiskAnalysisResponse) return;
+
+    final rawAddress = args['address'];
+    _result = rawResult;
+    _address = rawAddress is String ? rawAddress : '';
+    final isFromHistory = args['fromHistory'] == true;
+    if (isFromHistory) {
+      displayState.value = ResultDisplayState.ready;
     } else {
-      _result = _mockResult;
-      _address = '서울시 강남구 테헤란로 123';
       _saveToHistory();
     }
+  }
+
+  @override
+  void onReady() {
+    super.onReady();
+    if (_result == null) _handleMissingResult();
+  }
+
+  /// 분석 결과 없이 결과 화면이 열린 경우: 안내 후 홈으로 이동
+  void _handleMissingResult() {
+    log('분석 결과 없이 결과 화면 진입', name: 'ResultController');
+    Get.offAllNamed(Routes.home);
+    Get.snackbar(
+      '안내',
+      '결과를 불러올 수 없어요.',
+      snackPosition: SnackPosition.BOTTOM,
+      margin: const EdgeInsets.all(16),
+    );
   }
 
   Future<void> _saveToHistory() async {
@@ -150,41 +159,4 @@ class ResultController extends GetxController {
   void onScanPressed() => Get.toNamed(Routes.analyzing);
   void onHistoryPressed() => Get.toNamed(Routes.history);
   void onHelpSupportPressed() => Get.toNamed(Routes.helpSupport);
-
-  // TODO: 테스트용 — 배포 전 제거
-  void onResultTestPressed() => Get.toNamed(Routes.result);
-
-  static final _mockResult = RiskAnalysisResponse(
-    score: 18,
-    level: RiskLevel.danger,
-    issues: [
-      Issue(
-        clause: '전세보증금 반환 조항 부재',
-        reason: '계약 종료 후 보증금 반환 의무가 명시되지 않아 분쟁 가능성이 높습니다.',
-        severity: 3,
-        isLegalBasis: true,
-      ),
-      Issue(
-        clause: '임대인 동의 없는 전대차 허용',
-        reason: '임대인 동의 없이 제3자에게 전대가 가능하다는 조항은 법적 효력이 없습니다.',
-        severity: 2,
-        isLegalBasis: true,
-      ),
-      Issue(
-        clause: '수리비 전액 임차인 부담',
-        reason: '구조적 하자 포함 모든 수리를 임차인이 부담하도록 되어 있어 불공정 조항에 해당합니다.',
-        severity: 3,
-        isLegalBasis: false,
-      ),
-    ],
-    actionGuide: [
-      ActionGuide(type: 'stop', message: '즉시 계약 체결을 중단하고 전문가와 상담하세요.'),
-    ],
-    publicData: PublicData(
-      jeonseRatio: '118%',
-      isRegistered: false,
-      mortgageAmount: 280000000,
-    ),
-    mappingTablePurged: false,
-  );
 }
