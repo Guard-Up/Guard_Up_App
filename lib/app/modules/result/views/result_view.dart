@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../constants/app_constants.dart';
 import '../../../data/models/risk_analysis_response.dart';
+import '../constants/result_constants.dart';
 import '../controllers/result_controller.dart';
 
 class ResultView extends GetView<ResultController> {
@@ -395,7 +396,11 @@ class _GaugeBar extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final w = constraints.maxWidth;
-        final arrowX = ((score / 100) * w).clamp(0.0, w - 20.0);
+        const max = ResultConstants.maxScore;
+        const cautionMin = ResultConstants.cautionMinScore;
+        const safeMin = ResultConstants.safeMinScore;
+        // 화살표 아이콘(20) 중심이 점수 위치에 오도록 -10
+        final arrowX = ((score / max) * w - 10).clamp(0.0, w - 20.0);
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,15 +410,15 @@ class _GaugeBar extends StatelessWidget {
               child: Row(
                 children: [
                   Flexible(
-                    flex: 30,
+                    flex: cautionMin,
                     child: Container(height: 12, color: const Color(0xFFFF3826)),
                   ),
                   Flexible(
-                    flex: 35,
+                    flex: safeMin - cautionMin,
                     child: Container(height: 12, color: AppColors.caution),
                   ),
                   Flexible(
-                    flex: 35,
+                    flex: max - safeMin,
                     child: Container(height: 12, color: const Color(0xFF66BB6A)),
                   ),
                 ],
@@ -439,16 +444,16 @@ class _GaugeBar extends StatelessWidget {
               child: Stack(
                 children: [
                   Positioned(
-                    left: w * 0.30 - 8,
-                    child: const Text('30', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    left: w * cautionMin / max - 8,
+                    child: const Text('$cautionMin', style: TextStyle(color: Colors.white70, fontSize: 11)),
                   ),
                   Positioned(
-                    left: w * 0.65 - 8,
-                    child: const Text('65', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    left: w * safeMin / max - 8,
+                    child: const Text('$safeMin', style: TextStyle(color: Colors.white70, fontSize: 11)),
                   ),
                   Positioned(
                     right: 0,
-                    child: const Text('100', style: TextStyle(color: Colors.white70, fontSize: 11)),
+                    child: const Text('$max', style: TextStyle(color: Colors.white70, fontSize: 11)),
                   ),
                 ],
               ),
