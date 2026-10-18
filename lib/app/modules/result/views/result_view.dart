@@ -526,6 +526,18 @@ class _IssueRow extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (issue.locationLabel != null) ...[
+                  Text(
+                    issue.locationLabel!,
+                    style: const TextStyle(
+                      color: Colors.white70,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                      height: 1.4,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                ],
                 Text(
                   issue.clause,
                   style: const TextStyle(
@@ -544,6 +556,26 @@ class _IssueRow extends StatelessWidget {
                     height: 1.4,
                   ),
                 ),
+                if (issue.legalBasisLabel != null) ...[
+                  const SizedBox(height: 6),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.2),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      issue.legalBasisLabel!,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),

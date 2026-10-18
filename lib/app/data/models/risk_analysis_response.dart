@@ -56,13 +56,35 @@ class Issue {
   final String reason;
   final int severity;
   final bool isLegalBasis;
+  final String? location; // 계약서상 위치 (예: "특약사항 1항")
+  final int? page; // 몇 번째 이미지에서 나왔는지 (1부터)
+  final String? legalBasis; // 근거 법령·조문 (예: "주택임대차보호법 제3조")
 
   const Issue({
     required this.clause,
     required this.reason,
     required this.severity,
     required this.isLegalBasis,
+    this.location,
+    this.page,
+    this.legalBasis,
   });
+
+  /// "2페이지 · 특약사항 1항" 형태의 위치 라벨. 둘 다 없으면 null (API 응답 가공)
+  String? get locationLabel {
+    final parts = [
+      if (page != null) '$page페이지',
+      if (location != null && location!.isNotEmpty) location!,
+    ];
+    if (parts.isEmpty) return null;
+    return parts.join(' · ');
+  }
+
+  /// "근거: 주택임대차보호법 제3조". 근거가 없으면 null (API 응답 가공)
+  String? get legalBasisLabel {
+    if (legalBasis == null || legalBasis!.isEmpty) return null;
+    return '근거: $legalBasis';
+  }
 
   factory Issue.fromJson(Map<String, dynamic> json) {
     return Issue(
@@ -70,6 +92,9 @@ class Issue {
       reason: json['reason'] as String,
       severity: json['severity'] as int,
       isLegalBasis: json['is_legal_basis'] as bool? ?? false,
+      location: json['location'] as String?,
+      page: (json['page'] as num?)?.toInt(),
+      legalBasis: json['legal_basis'] as String?,
     );
   }
 
@@ -78,6 +103,9 @@ class Issue {
         'reason': reason,
         'severity': severity,
         'is_legal_basis': isLegalBasis,
+        if (location != null) 'location': location,
+        if (page != null) 'page': page,
+        if (legalBasis != null) 'legal_basis': legalBasis,
       };
 }
 
